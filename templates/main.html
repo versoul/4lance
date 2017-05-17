@@ -1,0 +1,14 @@
+{{define "content"}}
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">Registered metrics list:</div>
+        <div class="panel-body">
+            <ul class="list-group">
+                {{range $i, $v := .Metrics}}
+                <li class="list-group-item"><a href="/graphic/{{$v}}">{{$v}}</a></li>
+                {{end}}
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}}
