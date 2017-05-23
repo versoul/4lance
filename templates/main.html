@@ -1,13 +1,26 @@
 {{define "content"}}
 <div class="container">
-    <div class="panel panel-default">
-        <div class="panel-heading">Registered metrics list:</div>
-        <div class="panel-body">
-            <ul class="list-group">
-                {{range $i, $v := .Metrics}}
-                <li class="list-group-item"><a href="/graphic/{{$v}}">{{$v}}</a></li>
+    <div class="row">
+        <div class="col-xs-12 col-md-9">
+            <table class="projects table table-condensed">
+                <tbody>
+                {{range $i, $v := .projects}}
+                <tr data-id="{{$v._id}}" class="">
+                    <td><img src="/img/site" alt="" /></td>
+                    <td>
+                        <a href="{{$v.projectLink}}" title="">
+                            {{$v.projectTitle}}
+                        </a>
+                    </td>
+                    <td class="nowrap hidden-xs">{{$v.projectPrice}}</td>
+                    <td class="nowrap hidden-xs">{{$v.projectDate}}</td>
+                </tr>
                 {{end}}
-            </ul>
+                </tbody>
+            </table>
+        </div>
+        <div class="hidden-xs col-md-3">
+            Projects: {{.count}}
         </div>
     </div>
 </div>
