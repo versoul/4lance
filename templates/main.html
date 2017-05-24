@@ -6,9 +6,9 @@
                 <tbody>
                 {{range $i, $v := .projects}}
                 <tr data-id="{{$v._id}}" class="">
-                    <td><img src="/img/site" alt="" /></td>
+                    <td><img src="/img/{{.projectIcon}}" alt="" /></td>
                     <td>
-                        <a href="{{$v.projectLink}}" title="">
+                        <a href="{{$v.projectHref}}" title="">
                             {{$v.projectTitle}}
                         </a>
                     </td>

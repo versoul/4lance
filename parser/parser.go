@@ -79,7 +79,7 @@ func (self *singleton) parse() {
 			}
 
 			err = c.Insert(map[string]interface{}{
-				"site":         "fl",
+				"site":         "f-l",
 				"projectId":    projectId,
 				"projectTitle": projectTitle,
 				"projectHref":  projectHref,
@@ -103,8 +103,15 @@ func (self *singleton) parseOne(url string, id string) {
 	projectDescription = strings.TrimSpace(projectDescription)
 
 	catElem := descrElem.Next().Next()
-	dateString, err := catElem.Next().Children().Last().Html()
-	checkErr(err)
+	platnii, err := catElem.Next().Html()
+	dateString := ""
+	if strings.Index(platnii, "Платный проект") != -1 {
+		dateString, err = catElem.Next().Next().Children().Last().Html()
+		checkErr(err)
+	} else {
+		dateString, err = catElem.Next().Children().Last().Html()
+		checkErr(err)
+	}
 
 	re := regexp.MustCompile(`\[(.+)\]`)
 	if re.MatchString(dateString) {
@@ -112,8 +119,9 @@ func (self *singleton) parseOne(url string, id string) {
 	}
 	dateString = strings.TrimSpace(dateString)
 
+	loc, _ := time.LoadLocation("Europe/Moscow")
 	layout := "02.01.2006 | 15:04"
-	projectDate, err := time.Parse(layout, dateString)
+	projectDate, err := time.ParseInLocation(layout, dateString, loc)
 	checkErr(err)
 
 	var projectCategories []string
