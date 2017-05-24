@@ -42,6 +42,9 @@ func InitRoutes() {
 		}
 
 		for _, v := range results {
+			if str, ok := v["projectTitle"].(string); ok {
+				v["projectTitle"] = template.HTML(str)
+			}
 			if str, ok := v["projectPrice"].(string); ok {
 				v["projectPrice"] = template.HTML(str)
 			}
