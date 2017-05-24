@@ -18,6 +18,10 @@ func InitRoutes() {
 
 	initStaticRoutes(r)
 
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/dashboard")
+	})
+
 	r.LoadHTMLFiles("./templates/base.html",
 		"./templates/header.html",
 		"./templates/main.html")
