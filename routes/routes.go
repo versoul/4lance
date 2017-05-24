@@ -5,8 +5,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"html/template"
 	"net/http"
-	"versoul/4lance/templateHelpers"
 	"time"
+	"versoul/4lance/templateHelpers"
 )
 
 var (
@@ -66,7 +66,7 @@ func InitRoutes() {
 		})
 	})
 	//go r.Run() // listen and serve on 0.0.0.0:8080
-	r.Run()
+	r.Run("localhost:8080")
 }
 
 func initStaticRoutes(r *gin.Engine) {
