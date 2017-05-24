@@ -32,7 +32,7 @@ func InitRoutes() {
 		db := session.DB("4lance").C("projects")
 		// Query All
 		var results []map[string]interface{}
-		err = db.Find(nil).All(&results)
+		err = db.Find(nil).Sort("-projectDate").All(&results)
 		if err != nil {
 			panic(err)
 		}
