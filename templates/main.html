@@ -2,18 +2,31 @@
 <div class="container">
     <div class="row">
         <div class="col-xs-12 col-md-9">
+            <ul style="margin-top:0; margin-bottom:5px;" class="pagination pagination-sm pull-right">
+                <li>
+                    <a href="{{.pagination.prev}}">&laquo;</a>
+                </li>
+                {{range $i, $v := .pagination.pages}}
+                <li {{if $v.active}}class="active"{{end}}>
+                    <a href="{{$v.num}}">{{$v.num}}</a>
+                </li>
+                {{end}}
+                <li>
+                    <a href="{{.pagination.next}}">&raquo;</a>
+                </li>
+            </ul>
             <table class="projects table table-condensed">
                 <tbody>
                 {{range $i, $v := .projects}}
                 <tr data-id="{{$v._id}}" class="">
-                    <td><img src="/img/{{.projectIcon}}" alt="" /></td>
+                    <td><img src="/static/img/{{.projectIcon}}" alt="" /></td>
                     <td>
                         <a href="{{$v.projectHref}}" title="">
                             {{$v.projectTitle}}
                         </a>
                     </td>
                     <td class="nowrap hidden-xs">{{$v.projectPrice}}</td>
-                    <td class="nowrap hidden-xs">{{$v.projectDate}}</td>
+                    <td class="nowrap hidden-xs col-md-2">{{$v.projectDate}}</td>
                 </tr>
                 {{end}}
                 </tbody>
