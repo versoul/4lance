@@ -1,1 +1,9 @@
-CSS
+/*styled links in projects*/
+.projects tr {
+    cursor:pointer;
+}
+.projects a {
+    color: #333;
+    text-decoration:none;
+    cursor:pointer;
+}
