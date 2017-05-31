@@ -36,7 +36,7 @@ func (self *helpers) ToFullLink(site string, href string) string {
 	case "f-l":
 		link = "https://www.fl.ru"
 	case "wl":
-		link = "weblancer.net.gif"
+		link = "https://www.weblancer.net"
 	case "fl":
 		link = "freelance.png"
 	case "flm":

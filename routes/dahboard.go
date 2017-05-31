@@ -103,7 +103,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 			v["projectHref"] = hlprs.ToFullLink(site, href)
 		}
 		if date, ok := v["projectDate"].(time.Time); ok {
-			v["projectDate"] = hlprs.FormatTime(date, "02.01 | 15:04")
+			v["projectDate"] = hlprs.FormatTime(date, "02.01 15:04")
 		}
 	}
 
@@ -114,14 +114,14 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 
 	var pages []map[string]interface{}
 
-	for i := page; i < page+10; i++ {
+	for i := page; i < page+9; i++ {
 		p := map[string]interface{}{
 			"num": i,
 		}
 		if page == i {
 			p["active"] = true
 		}
-		if cnt-i*projectsPerPage > 0 {
+		if cnt-(i-1)*projectsPerPage >= 0 {
 			pages = append(pages, p)
 		}
 	}
