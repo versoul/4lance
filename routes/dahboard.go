@@ -2,6 +2,7 @@ package routes
 
 import (
 	"errors"
+	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"html/template"
@@ -78,7 +79,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer session.Close()
-
+	//Get data
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
@@ -86,7 +87,14 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
+	dbC := session.DB("4lance").C("categories")
+	// Query All
+	var categories []map[string]interface{}
+	err = dbC.Find(nil).All(&categories)
+	if err != nil {
+		panic(err)
+	}
+	//Works with data
 	for _, v := range results {
 		if str, ok := v["projectTitle"].(string); ok {
 			v["projectTitle"] = template.HTML(str)
@@ -106,14 +114,14 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 			v["projectDate"] = hlprs.FormatTime(date, "02.01 15:04")
 		}
 	}
-
+	//Get data count
 	cnt, err := db.Find(nil).Count()
 	if err != nil {
 		panic(err)
 	}
 
+	//Create pagination
 	var pages []map[string]interface{}
-
 	for i := page; i < page+9; i++ {
 		p := map[string]interface{}{
 			"num": i,
@@ -125,13 +133,11 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 			pages = append(pages, p)
 		}
 	}
-
 	prev := page - 1
 	if prev < 1 {
 		prev = 1
 	}
 	next := pages[len(pages)-1]["num"].(int)
-
 	if cnt-(next+1)*projectsPerPage > 0 {
 		next++
 	}
@@ -140,10 +146,11 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 		"prev":  prev,
 		"next":  next,
 	}
-
+	//Render template
 	renderTemplate(w, "main", map[string]interface{}{
 		"Error":      "Main Website",
 		"projects":   results,
+		"categories": categories,
 		"count":      cnt,
 		"pagination": pagination,
 	})

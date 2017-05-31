@@ -21,7 +21,7 @@
                 <tr data-id="{{$v._id}}" data-description="{{$v.projectDescription}}" class="">
                     <td><img src="/static/img/{{.projectIcon}}" alt="" /></td>
                     <td>
-                        <a href="{{$v.projectHref}}" title="">
+                        <a rel="nofollow" href="{{$v.projectHref}}" title="">
                             {{$v.projectTitle}}
                         </a>
                     </td>
@@ -44,7 +44,7 @@
         </div>
     </div>
 </div>
-<div id="myModal" class="modal fade">
+<div id="projectModal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -57,6 +57,63 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
                 <a target="_blank" class="btn btn-primary" id="toProjectBtn" href="#">Перейти</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="settingsModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Настройки</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#settings" data-toggle="tab">Настройки</a></li>
+                    <li><a href="#fl" data-toggle="tab">fl</a></li>
+                    <li><a href="#wl" data-toggle="tab">wl</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="settings">1</div>
+                    {{range $i, $v := index .categories 0}}
+                    {{if ne $i "_id"}}
+                    <div class="tab-pane" id="{{$i}}">
+                        <h4>Категории</h4>
+                        <div class="panel-group categoriesContainer">
+                            {{range $ii, $vv := $v}}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#{{$vv.tid}}">
+                                            {{$vv.name}}
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="{{$vv.tid}}" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        {{range $iii, $child := $vv.childs}}
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="{{$child.tid}}">
+                                                {{$child.name}}
+                                            </label>
+                                        </div>
+                                        {{end}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                    {{end}}
+                    {{end}}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                <button id="settingsModalSaveBtn" type="button" class="btn btn-primary">Сохранить</button>
             </div>
         </div>
     </div>
