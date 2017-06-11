@@ -2,7 +2,6 @@ package routes
 
 import (
 	"errors"
-	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"html/template"
