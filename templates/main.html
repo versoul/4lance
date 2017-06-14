@@ -76,7 +76,10 @@
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane active" id="settings">1</div>
+                    <div class="tab-pane active" id="settings">
+                        <label id="header-tegs">Укажите ключевые слова через запитую</label>
+                        <input id="tags" type="text" class="tags" value="android,Теги,для,демонстрации,нужно,их,будет,потом,удалить,из,input,JavaScript,ruby,kindle,js,go,cc,Golang"/>
+                    </div>
                     {{range $i, $v := index .categories 0}}
                     {{if ne $i "_id"}}
                     <div class="tab-pane" id="{{$i}}">
