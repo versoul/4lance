@@ -95,7 +95,7 @@
                     </div>-->
                     {{range $i, $v := index .categories 0}}
                     {{if ne $i "_id"}}
-                    <div class="tab-pane active" id="{{$i}}">
+                    <div class='tab-pane {{if eq $i "fl"}}active{{end}}' id="{{$i}}">
                         <h4>Категории</h4>
                         <div class="panel-group categoriesContainer">
                             {{range $ii, $vv := $v}}
