@@ -89,7 +89,12 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
-	err = db.Find(bson.M{"projectCategories": bson.M{"$in": ccc}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	if ccc != nil {
+		err = db.Find(bson.M{"projectCategories": bson.M{"$in": ccc}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	} else {
+		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	}
+
 	if err != nil {
 		panic(err)
 	}
