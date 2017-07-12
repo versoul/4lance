@@ -41,6 +41,19 @@
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Новости
+                </div>
+                <div class="panel-body news">
+                    <div>
+                        <div class="date">12.07.2017</div>
+                        <div class="content">
+                            Добавлена возможность фильтровать проекты по категориям
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -70,19 +83,19 @@
             </div>
             <div class="modal-body">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#settings" data-toggle="tab">Настройки</a></li>
-                    <li><a href="#fl" data-toggle="tab">fl</a></li>
+                    <!--<li class="active"><a href="#settings" data-toggle="tab">Настройки</a></li>-->
+                    <li class="active"><a href="#fl" data-toggle="tab">fl</a></li>
                     <li><a href="#wl" data-toggle="tab">wl</a></li>
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane active" id="settings">
+                    <!--<div class="tab-pane active" id="settings">
                         <label id="header-tegs">Укажите ключевые слова через запитую</label>
                         <input id="tags" type="text" class="tags" value="android,Теги,для,демонстрации,нужно,их,будет,потом,удалить,из,input,JavaScript,ruby,kindle,js,go,cc,Golang"/>
-                    </div>
+                    </div>-->
                     {{range $i, $v := index .categories 0}}
                     {{if ne $i "_id"}}
-                    <div class="tab-pane" id="{{$i}}">
+                    <div class="tab-pane active" id="{{$i}}">
                         <h4>Категории</h4>
                         <div class="panel-group categoriesContainer">
                             {{range $ii, $vv := $v}}
@@ -99,7 +112,7 @@
                                         {{range $iii, $child := $vv.childs}}
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" value="{{$child.tid}}">
+                                                <input type="checkbox" value="{{$child.tid}}" {{if $child.activ}}checked{{end}}>
                                                 {{$child.name}}
                                             </label>
                                         </div>

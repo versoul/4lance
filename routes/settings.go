@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-	//"github.com/pressly/chi"
 	"encoding/json"
 	"net/http"
 )
@@ -29,8 +27,5 @@ func saveFilter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sess.Set("categories", data.Categories)
-	ccc := sess.Get("categories")
-
-	fmt.Println("Save Filter")
-	fmt.Println(ccc)
+	w.Write([]byte("{}"))
 }

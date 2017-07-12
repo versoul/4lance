@@ -2,7 +2,6 @@ package routes
 
 import (
 	"errors"
-	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -14,7 +13,7 @@ import (
 )
 
 var (
-	projectsPerPage = 100
+	projectsPerPage = 50
 )
 
 type dashboardResource struct{}
@@ -72,9 +71,8 @@ func (rs dashboardResource) Routes() chi.Router {
 func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
-	ccc := sess.Get("categories")
-	fmt.Println("Get Filter")
-	fmt.Println(ccc)
+	sessCategories := sess.Get("categories")
+
 	page, err := strconv.Atoi(chi.URLParam(r, "page"))
 	if err != nil || page < 1 {
 		page = 1
@@ -89,8 +87,8 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
-	if ccc != nil {
-		err = db.Find(bson.M{"projectCategories": bson.M{"$in": ccc}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	if sessCategories != nil {
+		err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	}
@@ -104,6 +102,28 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	err = dbC.Find(nil).All(&categories)
 	if err != nil {
 		panic(err)
+	}
+
+	//Сравниваем категории с выбранными в сессии, помечаем для интерфейса
+	for _, row := range categories[0] {
+		row, ok := row.([]interface{})
+		if ok {
+			for _, c := range row {
+				cr := c.(map[string]interface{})
+				childs := cr["childs"].([]interface{})
+				for _, child := range childs {
+					child1 := child.(map[string]interface{})
+					tid := child1["tid"].(string)
+					if sessCategories != nil {
+						for _, v := range sessCategories.([]string) {
+							if v == tid {
+								child1["activ"] = true
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	//Works with data
 	for _, v := range results {

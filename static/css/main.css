@@ -11,3 +11,10 @@
 #settingsModal .modal-body {
     /*padding: 0;*/
 }
+
+.news .date {
+    font-size:0.8em;
+}
+.news .content {
+    border-top:1px dashed #ddd;
+}

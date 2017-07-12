@@ -37,7 +37,9 @@ $( document ).ready(function() {
             data: JSON.stringify({ categories: categories })
         })
         .done(function( msg ) {
-            console.log( "Data Saved: " + msg );
+            window.location.reload();
+        }).fail(function() {
+            alert("Sorry. Server unavailable. ");
         });
     });
 });
