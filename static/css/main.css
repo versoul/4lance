@@ -1,4 +1,7 @@
 /*styled links in projects*/
+.container {
+    width:100%;
+}
 .projects tr {
     cursor:pointer;
 }
