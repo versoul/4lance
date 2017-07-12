@@ -29,5 +29,15 @@ $( document ).ready(function() {
             })
         })
         console.log("CLC", categories);
+        $.ajax({
+            method: "POST",
+            url: "/saveFilter",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data: JSON.stringify({ categories: categories })
+        })
+        .done(function( msg ) {
+            console.log( "Data Saved: " + msg );
+        });
     });
 });

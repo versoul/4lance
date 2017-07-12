@@ -2,8 +2,10 @@ package routes
 
 import (
 	"errors"
+	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"html/template"
 	"net"
 	"net/http"
@@ -68,6 +70,11 @@ func (rs dashboardResource) Routes() chi.Router {
 }
 
 func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
+	sess, _ := globalSessions.SessionStart(w, r)
+	defer sess.SessionRelease(w)
+	ccc := sess.Get("categories")
+	fmt.Println("Get Filter")
+	fmt.Println(ccc)
 	page, err := strconv.Atoi(chi.URLParam(r, "page"))
 	if err != nil || page < 1 {
 		page = 1
@@ -82,7 +89,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
-	err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	err = db.Find(bson.M{"projectCategories": bson.M{"$in": ccc}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	if err != nil {
 		panic(err)
 	}

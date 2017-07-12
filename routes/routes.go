@@ -6,14 +6,16 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/astaxie/beego/session"
 	"os"
 	"path/filepath"
 	"versoul/4lance/templateHelpers"
 )
 
 var (
-	hlprs   = templateHelpers.GetHelpers()
-	localIp = "192.168.1.91"
+	hlprs          = templateHelpers.GetHelpers()
+	localIp        = "192.168.1.91"
+	globalSessions *session.Manager
 )
 var EcternalIp string
 
@@ -22,6 +24,19 @@ func minus(a, b int64) string {
 	fmt.Println(b)
 	return "12"
 	//return strconv.FormatInt(a-b, 10)
+}
+
+func init() {
+	sessionConfig := &session.ManagerConfig{
+		CookieName:      "sessionid",
+		EnableSetCookie: true,
+		Gclifetime:      86400,
+		CookieLifeTime:  86400,
+		Secure:          false,
+		ProviderConfig:  "./tmp",
+	}
+	globalSessions, _ = session.NewManager("file", sessionConfig)
+	go globalSessions.GC()
 }
 
 func renderTemplate(w http.ResponseWriter, name string, pageData map[string]interface{}) {
@@ -70,6 +85,7 @@ func InitRoutes() {
 	})
 
 	r.Mount("/dashboard/", dashboardResource{}.Routes())
+	r.Post("/saveFilter", saveFilter)
 
 	http.ListenAndServe(":8080", r)
 }
