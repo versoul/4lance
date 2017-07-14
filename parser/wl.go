@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html/charset"
 	"gopkg.in/mgo.v2"
@@ -37,10 +38,12 @@ func (self *wlParser) parse() {
 	defer session.Close()
 	c := session.DB(self.dbName).C(self.collectionName)
 	resp, err := http.Get(self.site + "/jobs/?type=project")
-	if err != nil {
-		checkErr(err)
-	}
 	defer resp.Body.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	utf8, err := charset.NewReader(resp.Body, resp.Header.Get("Content-Type"))
 	if err != nil {
 		checkErr(err)

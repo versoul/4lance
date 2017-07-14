@@ -2,6 +2,7 @@ package routes
 
 import (
 	"errors"
+	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -72,6 +73,8 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
 	sessCategories := sess.Get("categories")
+	sessKeywords := sess.Get("keywords")
+	fmt.Println(sessKeywords)
 
 	page, err := strconv.Atoi(chi.URLParam(r, "page"))
 	if err != nil || page < 1 {
@@ -88,7 +91,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	// Query All
 	var results []map[string]interface{}
 	if sessCategories != nil {
-		err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+		err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories}, "projectDescription": bson.M{"$regex": bson.RegEx{`python`, "gmi"}}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	}
@@ -179,10 +182,11 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	}
 	//Render template
 	renderTemplate(w, "main", map[string]interface{}{
-		"Error":      "Main Website",
-		"projects":   results,
-		"categories": categories,
-		"count":      cnt,
-		"pagination": pagination,
+		"Error":        "Main Website",
+		"projects":     results,
+		"categories":   categories,
+		"count":        cnt,
+		"pagination":   pagination,
+		"sessKeywords": sessKeywords,
 	})
 }

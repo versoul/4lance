@@ -2,7 +2,19 @@
 <div class="container">
     <div class="row">
         <div class="hidden-xs col-md-3">
-            <iframe src="https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D0%B8%20%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5%204lance.ru&targets-hint=&default-sum=100&button-text=11&payment-type-choice=on&hint=&successURL=&quickpay=shop&account=41001811171337" width="450" height="198" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Фильтр
+                </div>
+                <div class="modal-body">
+                    <div>Ключевые слова:</div>
+
+                    <input type="text" id="keyWords" value="{{range $i, $v := .sessKeywords}}{{$v}},{{end}}" data-role="tagsinput" />
+                    <div class="clearfix"> </div>
+                    <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn" class="btn btn-primary pull-right">Применить</button>
+                    <div class="clearfix"> </div>
+                </div>
+            </div>
         </div>
         <div class="col-xs-12 col-md-7">
             <ul style="margin-top:0; margin-bottom:5px;" class="pagination pagination-sm pull-right">
@@ -34,6 +46,7 @@
                 {{end}}
                 </tbody>
             </table>
+            <iframe  src="https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D0%B8%20%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5%204lance.ru&targets-hint=&default-sum=100&button-text=11&payment-type-choice=on&hint=&successURL=&quickpay=shop&account=41001811171337" width="450" height="198" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
         </div>
         <div class="hidden-xs col-md-2">
             <div class="panel panel-default">
@@ -93,8 +106,7 @@
 
                 <div class="tab-content">
                     <!--<div class="tab-pane active" id="settings">
-                        <label id="header-tegs">Укажите ключевые слова через запитую</label>
-                        <input id="tags" type="text" class="tags" value="android,Теги,для,демонстрации,нужно,их,будет,потом,удалить,из,input,JavaScript,ruby,kindle,js,go,cc,Golang"/>
+
                     </div>-->
                     {{range $i, $v := index .categories 0}}
                     {{if ne $i "_id"}}

@@ -86,8 +86,9 @@ func InitRoutes() {
 
 	r.Mount("/dashboard/", dashboardResource{}.Routes())
 	r.Post("/saveFilter", saveFilter)
+	r.Post("/saveKeyWords", saveKeyWords)
 
-	http.ListenAndServe(":8080", r)
+	panic(http.ListenAndServe(":8080", r))
 }
 func staticRoutes() chi.Router {
 	r := chi.NewRouter()

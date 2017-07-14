@@ -27,8 +27,7 @@ $( document ).ready(function() {
                 }
 
             })
-        })
-        console.log("CLC", categories);
+        });
         $.ajax({
             method: "POST",
             url: "/saveFilter",
@@ -38,7 +37,25 @@ $( document ).ready(function() {
         })
         .done(function( msg ) {
             window.location.reload();
-        }).fail(function() {
+        })
+        .fail(function() {
+            alert("Sorry. Server unavailable. ");
+        });
+    });
+    $("#keyWordsAcceptBtn").click(function(e){
+        e.preventDefault();
+        var keyWords = $("#keyWords").tagsinput('items');
+        $.ajax({
+            method: "POST",
+            url: "/saveKeyWords",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data: JSON.stringify({ keywords: keyWords })
+        })
+        .done(function( msg ) {
+            window.location.reload();
+        })
+        .fail(function() {
             alert("Sorry. Server unavailable. ");
         });
     });

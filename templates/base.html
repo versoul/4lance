@@ -15,36 +15,17 @@
 
     <title>Агрегатор фриланс проектов</title>
     <link href="/static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/lib/jquery.tagsinput.css" rel="stylesheet">
+    <link href="/static/lib/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
     <link href="/static/css/main.css" rel="stylesheet">
     <script src="/static/lib/jquery-3.2.1.min.js"></script>
     <script src="/static/lib/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/static/lib/jquery.tagsinput.js"></script>
+    <script src="/static/lib/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
     <script src="/static/js/main.js"></script>
     <!--<script src="/lib/highcharts/highcharts.js"></script>
     <script src="/lib/highcharts/modules/exporting.js"></script>-->
 </head>
 
 <body>
-<script>
-$(function() {    
-    $('#tags').tagsInput({
-        width: 'auto',
-        height:'auto',
-        onChange: function(elem_tags) {
-            var languages = ['php', 'ruby', 'javascript','js', 'go', 'c++', 'golang'];
-            $('.tag').each(function(index, elem) {
-                function isLanguages(elemM){                    
-                    return elemM.toLowerCase() === elem.textContent.slice(0, -3).toLowerCase();
-                }
-                if (languages.some(isLanguages))
-                $(this).css('background-color', 'yellow');
-            });
-        },       
-
-    });
-});
-</script>
 {{template "header" .}}
 {{template "content" .}}
 {{template "metrics" .}}

@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -35,7 +36,10 @@ func (self *flParser) parse() {
 	defer session.Close()
 	c := session.DB(self.dbName).C(self.collectionName)
 	doc, err := goquery.NewDocument(self.site + "/projects/?kind=1")
-	checkErr(err)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	doc.Find("#projects-list div.b-post:not(.topprjpay)").Each(func(i int, s *goquery.Selection) {
 
 		priceStr := s.Children().First().Text()
