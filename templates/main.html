@@ -44,6 +44,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="panel panel-default panel-invisible">
+                        <div class="panel-heading">
+                            Фильтр
+                        </div>
+                        <div class="panel-body">
+                            <div>Ключевые слова:</div>
+
+                            <input type="text" id="keyWords" value="{{range $i, $v := .sessKeywords}}{{$v}},{{end}}" data-role="tagsinput" />
+                            <div class="clearfix"> </div>
+                            <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn" class="btn btn-primary">Применить</button>
+                            <div class="clearfix"> </div>
+                            <button type="button" style="margin-top:20px;" class="btn btn-default" data-toggle="modal" data-target="#settingsModal">
+                                <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                                Настройка бирж
+                            </button>
+                            <div class="clearfix"> </div>
+
+                        </div>
+                    </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Новости

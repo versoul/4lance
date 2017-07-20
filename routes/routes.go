@@ -88,6 +88,9 @@ func InitRoutes() {
 	r.Post("/saveFilter", saveFilter)
 	r.Post("/saveKeyWords", saveKeyWords)
 
+	r.Get("/register/", registerPage)
+	r.Get("/login/", loginPage)
+
 	panic(http.ListenAndServe(":8080", r))
 }
 func staticRoutes() chi.Router {
