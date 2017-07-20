@@ -91,7 +91,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	// Query All
 	var results []map[string]interface{}
 	if sessCategories != nil {
-		err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories}, "projectDescription": bson.M{"$regex": bson.RegEx{`python`, "gmi"}}}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+		err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories} /*, "projectDescription": bson.M{"$regex": bson.RegEx{`python`, "gmi"}}*/}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	}

@@ -81,6 +81,7 @@ func (self *flParser) parse() {
 	})
 }
 func (self *flParser) parseOne(url string, id string) {
+
 	doc, err := goquery.NewDocument(self.site + url)
 	checkErr(err)
 	descrElem := doc.Find("#projectp" + id)
@@ -108,7 +109,10 @@ func (self *flParser) parseOne(url string, id string) {
 	loc, _ := time.LoadLocation("Europe/Moscow")
 	layout := "02.01.2006 | 15:04"
 	projectDate, err := time.ParseInLocation(layout, dateString, loc)
-	checkErr(err)
+	if err != nil {
+		fmt.Println("Project: " + url)
+		panic(err)
+	}
 
 	var projectCategories []string
 	catElem.ChildrenFiltered("a").Each(func(i int, s *goquery.Selection) {
