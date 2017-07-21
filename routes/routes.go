@@ -79,7 +79,6 @@ func InitRoutes() {
 	r.FileServer("/static", http.Dir(filesDir))
 
 	staticRoutes(r)
-
 	authRoutes(r)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {

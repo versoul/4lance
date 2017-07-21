@@ -1,6 +1,19 @@
 
 $( document ).ready(function() {
 
+    $('#example-getting-started').multiselect({
+        enableClickableOptGroups: true,
+        includeSelectAllOption: true,
+        enableFiltering: true,
+        buttonWidth: '400px',
+        numberDisplayed: 0,
+        selectAllText: 'Выбрать все категории',
+        nonSelectedText: 'Выбрать категории',
+        nSelectedText: ' выбрано',
+        allSelectedText: 'Выбраны все категории'
+    });
+
+
     $("#projectsList tr").click(function(e){
         if(!e.ctrlKey){
             e.preventDefault();
