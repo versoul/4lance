@@ -31,18 +31,23 @@
                 <!--<li><a href="/admin/">Админка</a></li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                {{if .user}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-user" aria-hidden="true"></i>
-                        versoul@rambler.ru
+                        {{.user.email}}
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i> Профиль</a></li>
-                        <li><a href="#"><i class="fa fa-tachometer" aria-hidden="true"></i> Админка</a></li>
-                        <li><a href="#"><i class="fa fa-sign-out" aria-hidden="true"></i> Выйти</a></li>
+                        <li><a href="/profile/"><i class="fa fa-cog" aria-hidden="true"></i> Профиль</a></li>
+                        {{if .user.admin}}
+                        <li><a href="/admin/"><i class="fa fa-tachometer" aria-hidden="true"></i> Админка</a></li>
+                        {{end}}
+                        <li><a href="/logout/"><i class="fa fa-sign-out" aria-hidden="true"></i> Выйти</a></li>
                     </ul>
                 </li>
+                {{end}}
+                {{if not .user}}
                 <li>
                     <a href="/register/">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -55,6 +60,7 @@
                         Войти
                     </a>
                 </li>
+                {{end}}
             </ul>
         </div>
     </div>

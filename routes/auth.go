@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/pressly/chi"
 	"net/http"
 	"versoul/4lance/auth"
@@ -20,16 +20,28 @@ var (
 	})
 )
 
+func init() {
+	r.Get("/register/", registerPage)
+	r.Get("/login/", loginPage)
+	r.Get("/confirmMessage/", confirmMessagePage)
+	r.Get("/confirmEmail/:confirmationHash/", confirmEmailPage)
+	r.Get("/logout/", logoutAction)
+
+	r.Post("/register/", registerAction)
+	r.Post("/login/", loginAction)
+}
+
 func registerPage(w http.ResponseWriter, r *http.Request) {
-	id, err := a.RegisterUser("mailto.versoul@gmail.com", "111")
-	if err != nil {
-		fmt.Println("Register fail - " + err.Error())
-	} else {
-		fmt.Println("Register success")
-		fmt.Println(id)
-		a.SendConfirmationEmail(id)
-	}
 	renderTemplate(w, "register", map[string]interface{}{})
+}
+func loginPage(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "login", map[string]interface{}{})
+}
+func confirmMessagePage(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "message", map[string]interface{}{
+		"Type":    "info",
+		"Message": "На ваш email выслано письмо для активации аккаунта. Перейдите по ссылке в нем.",
+	})
 }
 func confirmEmailPage(w http.ResponseWriter, r *http.Request) {
 	err := a.ConfirmEmail(chi.URLParam(r, "confirmationHash"))
@@ -44,8 +56,41 @@ func confirmEmailPage(w http.ResponseWriter, r *http.Request) {
 			"Message": "Email подтвержден и аккаунт успешно активирован. Можете авторизироваться и пользоваться сервисом.",
 		})
 	}
-
 }
-func loginPage(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "login", map[string]interface{}{})
+
+func registerAction(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		panic(err)
+	}
+	id, err := a.RegisterUser(data["email"].(string), data["password"].(string))
+	if err != nil {
+		w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))
+	} else {
+		a.SendConfirmationEmail(id)
+		w.Write([]byte("{\"status\":\"ok\"}"))
+	}
+}
+func loginAction(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		panic(err)
+	}
+	userData, err := a.LoginUser(data["email"].(string), data["password"].(string))
+	if err != nil {
+		w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))
+	} else {
+		sess, _ := globalSessions.SessionStart(w, r)
+		defer sess.SessionRelease(w)
+		sess.Set("user", userData)
+		w.Write([]byte("{\"status\":\"ok\"}"))
+	}
+}
+func logoutAction(w http.ResponseWriter, r *http.Request) {
+	sess, _ := globalSessions.SessionStart(w, r)
+	defer sess.SessionRelease(w)
+	sess.Flush()
+	http.Redirect(w, r, "/dashboard/", 302)
 }

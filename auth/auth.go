@@ -50,7 +50,7 @@ func (self *singleton) RegisterUser(email string, pass string) (interface{}, err
 			return nil, err
 
 		} else if cnt != 0 {
-			return nil, errors.New("Email already exists.")
+			return nil, errors.New("Такой email уже зарагестрирован")
 		}
 		id = bson.NewObjectId()
 		err = db.Insert(bson.M{
@@ -111,7 +111,7 @@ func (self *singleton) SendConfirmationEmail(id interface{}) error {
 		if err := d.DialAndSend(m); err != nil {
 			fmt.Println("Ошибка отправки на адрес " + email + " : " + err.Error())
 		} else {
-			fmt.Println("Успешно отправлено на адрес " + email)
+			//fmt.Println("Успешно отправлено на адрес " + email)
 		}
 	}
 	return nil
@@ -132,7 +132,7 @@ func (self *singleton) ConfirmEmail(confirmationHash string) error {
 		if err != nil {
 			return err
 		} else if cnt == 0 {
-			return errors.New("Email уже подтвержден.")
+			return errors.New("Email уже подтвержден")
 		}
 
 		query := bson.M{"confirmationHash": confirmationHash}
@@ -149,4 +149,37 @@ func (self *singleton) ConfirmEmail(confirmationHash string) error {
 
 	}
 	return nil
+}
+
+func (self *singleton) LoginUser(email string, pass string) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	switch self.provider {
+	case "mongodb":
+		mgoSession, err := mgo.Dial(self.config["dbHost"].(string))
+		if err != nil {
+			panic(err)
+		}
+		defer mgoSession.Close()
+		db := mgoSession.DB(self.config["dbName"].(string)).C("users")
+		cnt, err := db.Find(bson.M{"email": email}).Count()
+		if err != nil {
+			return nil, err
+
+		} else if cnt == 0 {
+			return nil, errors.New("Такой email не зарагестрирован")
+		}
+
+		err = db.Find(bson.M{"email": email}).One(&result)
+		if err != nil {
+			return nil, err
+
+		}
+
+		if getMD5Hash(pass) != result["pass"].(string) {
+			return nil, errors.New("Пароль не верный")
+		}
+	}
+	delete(result, "_id")
+	delete(result, "pass")
+	return result, nil
 }

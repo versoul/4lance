@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	r              = chi.NewRouter()
 	hlprs          = templateHelpers.GetHelpers()
 	localIp        = "192.168.1.91"
 	globalSessions *session.Manager
@@ -73,29 +74,21 @@ func renderTemplate(w http.ResponseWriter, name string, pageData map[string]inte
 	tpl.ExecuteTemplate(w, "base", pageData)
 }
 func InitRoutes() {
-	r := chi.NewRouter()
 
 	r.Mount("/", staticRoutes())
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/dashboard/", 302)
-	})
-	r.Get("/dashboard", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/dashboard/", 302)
+		http.Redirect(w, r, "/dashboard/", http.StatusFound)
 	})
 
 	r.Mount("/dashboard/", dashboardResource{}.Routes())
 	r.Post("/saveFilter", saveFilter)
 	r.Post("/saveKeyWords", saveKeyWords)
 
-	r.Get("/register/", registerPage)
-	r.Get("/confirmEmail/:confirmationHash/", confirmEmailPage)
-	r.Get("/login/", loginPage)
-
 	panic(http.ListenAndServe(":8080", r))
 }
 func staticRoutes() chi.Router {
-	r := chi.NewRouter()
+	//r := chi.NewRouter()
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "static")
 	r.FileServer("/static", http.Dir(filesDir))

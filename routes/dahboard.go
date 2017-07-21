@@ -2,7 +2,6 @@ package routes
 
 import (
 	"errors"
-	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -74,7 +73,9 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	defer sess.SessionRelease(w)
 	sessCategories := sess.Get("categories")
 	sessKeywords := sess.Get("keywords")
-	fmt.Println(sessKeywords)
+	sessUser := sess.Get("user")
+	var userData = map[string]interface{}{}
+	userData, _ = sessUser.(map[string]interface{})
 
 	page, err := strconv.Atoi(chi.URLParam(r, "page"))
 	if err != nil || page < 1 {
@@ -188,5 +189,6 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 		"count":        cnt,
 		"pagination":   pagination,
 		"sessKeywords": sessKeywords,
+		"user":         userData,
 	})
 }

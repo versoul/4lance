@@ -574,3 +574,10 @@ body {
 .dropdown-menu>li>a {
     color:#777;
 }
+
+/*********************/
+#formErr {
+    padding:7px;
+    display:none;
+    text-align:center;
+}
