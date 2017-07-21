@@ -89,6 +89,7 @@ func InitRoutes() {
 	r.Post("/saveKeyWords", saveKeyWords)
 
 	r.Get("/register/", registerPage)
+	r.Get("/confirmEmail/:confirmationHash/", confirmEmailPage)
 	r.Get("/login/", loginPage)
 
 	panic(http.ListenAndServe(":8080", r))

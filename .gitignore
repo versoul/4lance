@@ -1,4 +1,5 @@
-.idea
+.idea/
 errors.a
 /pkg/
 /tmp/
+config.json
