@@ -20,7 +20,7 @@ var (
 	})
 )
 
-func init() {
+func authRoutes(r chi.Router) {
 	r.Get("/register/", registerPage)
 	r.Get("/login/", loginPage)
 	r.Get("/confirmMessage/", confirmMessagePage)
