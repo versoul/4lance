@@ -12,6 +12,8 @@ type config struct {
 	MailPort int    `json"mailPort"`
 	MailUser string `json"mailUser"`
 	MailPass string `json"mailPass"`
+	DbHost   string `json"dbHost"`
+	DbName   string `json"dbName"`
 }
 
 var instance *config

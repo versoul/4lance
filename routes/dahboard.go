@@ -2,14 +2,15 @@ package routes
 
 import (
 	"errors"
+	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"html/template"
+	//"html/template"
 	"net"
 	"net/http"
 	"strconv"
-	"time"
+	//"time"
 )
 
 var (
@@ -58,6 +59,22 @@ func externalIP() (string, error) {
 	}
 	return "", errors.New("are you connected to the network?")
 }
+func getUserData(userEmail string) map[string]interface{} {
+	var result map[string]interface{}
+	mgoSession, err := mgo.Dial(conf.DbHost)
+	if err != nil {
+		panic(err)
+	}
+	defer mgoSession.Close()
+	db := mgoSession.DB(conf.DbName).C("users")
+
+	err = db.Find(bson.M{"email": userEmail}).One(&result)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return result
+}
 
 // Routes creates a REST router for the todos resource
 func (rs dashboardResource) Routes() chi.Router {
@@ -71,11 +88,13 @@ func (rs dashboardResource) Routes() chi.Router {
 func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
-	sessCategories := sess.Get("categories")
-	sessKeywords := sess.Get("keywords")
+
 	sessUser := sess.Get("user")
 	var userData = map[string]interface{}{}
-	userData, _ = sessUser.(map[string]interface{})
+	if sessUser != nil {
+		userData = getUserData(sessUser.(string))
+	}
+	fmt.Println(userData)
 
 	page, err := strconv.Atoi(chi.URLParam(r, "page"))
 	if err != nil || page < 1 {
@@ -91,8 +110,8 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
-	if sessCategories != nil {
-		err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories} /*, "projectDescription": bson.M{"$regex": bson.RegEx{`python`, "gmi"}}*/}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	if false {
+		//err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories} /*, "projectDescription": bson.M{"$regex": bson.RegEx{`python`, "gmi"}}*/}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	}
@@ -109,7 +128,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Сравниваем категории с выбранными в сессии, помечаем для интерфейса
-	for _, row := range categories[0] {
+	/*for _, row := range categories[0] {
 		row, ok := row.([]interface{})
 		if ok {
 			for _, c := range row {
@@ -128,27 +147,8 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-	}
-	//Works with data
-	for _, v := range results {
-		if str, ok := v["projectTitle"].(string); ok {
-			v["projectTitle"] = template.HTML(str)
-		}
-		if str, ok := v["projectPrice"].(string); ok {
-			v["projectPrice"] = template.HTML(str)
-		}
-		if str, ok := v["site"].(string); ok {
-			v["projectIcon"] = hlprs.SiteToIcon(str)
-		}
-		href, ok1 := v["projectHref"].(string)
-		site, ok2 := v["site"].(string)
-		if ok1 && ok2 {
-			v["projectHref"] = hlprs.ToFullLink(site, href)
-		}
-		if date, ok := v["projectDate"].(time.Time); ok {
-			v["projectDate"] = hlprs.FormatTime(date, "02.01 15:04")
-		}
-	}
+	}*/
+
 	//Get data count
 	cnt, err := db.Find(nil).Count()
 	if err != nil {
@@ -183,12 +183,12 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	}
 	//Render template
 	renderTemplate(w, "main", map[string]interface{}{
-		"Error":        "Main Website",
-		"projects":     results,
-		"categories":   categories,
-		"count":        cnt,
-		"pagination":   pagination,
-		"sessKeywords": sessKeywords,
-		"user":         userData,
+		"Error":      "Main Website",
+		"projects":   results,
+		"categories": categories,
+		"count":      cnt,
+		"pagination": pagination,
+		//"sessKeywords": sessKeywords,
+		"user": userData,
 	})
 }

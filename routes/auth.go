@@ -11,8 +11,8 @@ import (
 var (
 	conf = config.GetInstance()
 	a    = auth.GetInstance("mongodb", map[string]interface{}{
-		"dbHost":   "localhost",
-		"dbName":   "4lance",
+		"dbHost":   conf.DbHost,
+		"dbName":   conf.DbName,
 		"mailHost": conf.MailHost,
 		"mailPort": conf.MailPort,
 		"mailUser": conf.MailUser,
@@ -84,7 +84,7 @@ func loginAction(w http.ResponseWriter, r *http.Request) {
 	} else {
 		sess, _ := globalSessions.SessionStart(w, r)
 		defer sess.SessionRelease(w)
-		sess.Set("user", userData)
+		sess.Set("user", userData["email"].(string))
 		w.Write([]byte("{\"status\":\"ok\"}"))
 	}
 }

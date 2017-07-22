@@ -13,7 +13,6 @@ import (
 )
 
 var (
-	hlprs          = templateHelpers.GetHelpers()
 	localIp        = "192.168.1.91"
 	globalSessions *session.Manager
 )
@@ -42,13 +41,6 @@ func init() {
 func renderTemplate(w http.ResponseWriter, name string, pageData map[string]interface{}) {
 	w.Header().Set("Content-type", "text/html")
 
-	var funcMap = template.FuncMap{
-		"minus": minus,
-		"inc": func(i int) int {
-			return i + 1
-		},
-	}
-
 	templates := []string{
 		"./templates/base.html",
 		"./templates/header.html",
@@ -65,7 +57,7 @@ func renderTemplate(w http.ResponseWriter, name string, pageData map[string]inte
 	//Подключаем запрошеный шаблон
 	templates = append(templates, "./templates/"+name+".html")
 	//Парсим все шаблоны
-	var tpl = template.New(name).Funcs(funcMap)
+	var tpl = template.New(name).Funcs(templateHelpers.Helpers)
 	for i := 0; i < len(templates); i++ {
 		tpl.ParseFiles(templates[i])
 	}

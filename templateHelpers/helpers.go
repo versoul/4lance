@@ -1,22 +1,23 @@
 package templateHelpers
 
 import (
-	"sync"
+	"html/template"
 	"time"
 )
 
-type helpers struct{}
-
-var instance *helpers
-var once sync.Once
-
-func GetHelpers() *helpers {
-	once.Do(func() {
-		instance = &helpers{}
-	})
-	return instance
+//type helpers struct{}
+var Helpers = template.FuncMap{
+	"siteToIcon": siteToIcon,
+	"siteToName": siteToName,
+	"toFullLink": toFullLink,
+	"formatTime": formatTime,
+	"toHtml":     toHtml,
+	"inc": func(i int) int {
+		return i + 1
+	},
 }
-func (self *helpers) SiteToIcon(site string) string {
+
+func siteToIcon(site string) string {
 	icon := ""
 	switch site {
 	case "f-l":
@@ -30,7 +31,21 @@ func (self *helpers) SiteToIcon(site string) string {
 	}
 	return icon
 }
-func (self *helpers) ToFullLink(site string, href string) string {
+func siteToName(site string) string {
+	icon := ""
+	switch site {
+	case "f-l":
+		icon = "fl.ru"
+	case "wl":
+		icon = "weblancer.net"
+	case "fl":
+		icon = "freelance.ru"
+	case "flm":
+		icon = "freelansim.ru"
+	}
+	return icon
+}
+func toFullLink(site string, href string) string {
 	link := ""
 	switch site {
 	case "f-l":
@@ -45,6 +60,9 @@ func (self *helpers) ToFullLink(site string, href string) string {
 	link += href
 	return link
 }
-func (self *helpers) FormatTime(date time.Time, layout string) string {
+func toHtml(str string) template.HTML {
+	return template.HTML(str)
+}
+func formatTime(date time.Time, layout string) string {
 	return date.Format(layout)
 }

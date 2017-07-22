@@ -1,16 +1,21 @@
 
 $( document ).ready(function() {
 
-    $('#example-getting-started').multiselect({
+    $('.categoriesMultiselect').multiselect({
         enableClickableOptGroups: true,
         includeSelectAllOption: true,
         enableFiltering: true,
         buttonWidth: '400px',
+        maxHeight: 400,
         numberDisplayed: 0,
         selectAllText: 'Выбрать все категории',
         nonSelectedText: 'Выбрать категории',
         nSelectedText: ' выбрано',
-        allSelectedText: 'Выбраны все категории'
+        allSelectedText: 'Выбраны все категории',
+        filterPlaceholder: 'Поиск',
+        filterBehavior: 'text',
+        enableCaseInsensitiveFiltering: true,
+        numberDisplayed: 0,
     });
 
 
