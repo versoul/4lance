@@ -3,3 +3,4 @@ errors.a
 /pkg/
 /tmp/
 config.json
+users.json

@@ -17,13 +17,20 @@ $( document ).ready(function() {
         filterBehavior: 'text',
         enableCaseInsensitiveFiltering: true,
         numberDisplayed: 0,
-        onChange: function(element, checked) {
-            console.log("CHANGED", element.val(), checked)
+        buttonTitle: function(options, select){
+            return "";
         }
     });
-    $( "div.projectsFilter" ).tooltip({
-        track:true
-    })
+
+    if(!window.auth){
+        $( "div.projectsFilter" ).tooltip({
+            track:true
+        });
+    }
+    else{
+        $(".projectsFilter").prop("title", "");
+    }
+
 
     $("#projectsList tr").click(function(e){
         if(!e.ctrlKey){
@@ -38,49 +45,52 @@ $( document ).ready(function() {
             modal.modal('show');
         }
     });
-    $("#settingsModalSaveBtn").click(function(e){
+    $("#filterSaveBtn").click(function(e){
         e.preventDefault();
+        var keyWords = $("#keyWords").tagsinput('items');
         var categories = [];
-        var catContainerElem = $(".categoriesContainer");
-        $.each(catContainerElem, function(k, v){
-            var checboxs = $(v).find("input:checkbox");
-            $.each(checboxs, function(i, c){
-                c = $(c);
-                if(c.is(":checked")){
-                    categories.push(c.val());
-                }
-
-            })
-        });
+        var multiselects = $('.categoriesMultiselect');
+        for(var i=0,l=multiselects.length; i<l; i++){
+            categories = categories.concat($(multiselects[i]).val());
+        }
         $.ajax({
             method: "POST",
-            url: "/saveFilter",
+            url: "/filterSave",
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            data: JSON.stringify({ categories: categories })
+            data: JSON.stringify({ keywords: keyWords, categories: categories })
         })
         .done(function( msg ) {
-            window.location.reload();
+            if(msg.status == "err"){
+                alert(msg.error);
+            }
+            else{
+                window.location.reload();
+            }
         })
         .fail(function() {
             alert("Sorry. Server unavailable. ");
         });
     });
-    $("#keyWordsAcceptBtn").click(function(e){
+    $("#filterResetBtn").click(function(e){
         e.preventDefault();
-        var keyWords = $("#keyWords").tagsinput('items');
         $.ajax({
             method: "POST",
-            url: "/saveKeyWords",
+            url: "/filterReset",
             contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            data: JSON.stringify({ keywords: keyWords })
+            dataType: 'json'
         })
         .done(function( msg ) {
-            window.location.reload();
+            if(msg.status == "err"){
+                alert(msg.error);
+            }
+            else{
+                window.location.reload();
+            }
         })
         .fail(function() {
             alert("Sorry. Server unavailable. ");
+            return false;
         });
     });
 

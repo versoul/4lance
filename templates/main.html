@@ -1,4 +1,12 @@
 {{define "content"}}
+{{ $root := . }}
+<script>
+    {{if .user}}
+    window.auth = true;
+    {{else}}
+    window.auth = false;
+    {{end}}
+</script>
 <div class="container">
     <div class="caTheme panel panel-default">
         <div class="panel-body">
@@ -59,7 +67,7 @@
                             {{if ne $i "_id"}}
                             <div class="categories-container">
                                 <p><img src='/static/img/{{siteToIcon $i}}' alt="" /><span>{{siteToName $i}}</span></p>
-                                <select class="categoriesMultiselect" multiple="multiple">
+                                <select class="categoriesMultiselect" multiple="multiple" {{if not $root.user}}disabled{{end}}>
                                     {{range $ii, $vv := $v}}
                                     <optgroup label="{{$vv.name}}">
                                         {{range $iii, $child := $vv.childs}}
@@ -74,18 +82,26 @@
                             <hr/>
                             <div>Ключевые слова:</div>
 
-                            <input type="text" id="keyWords" value="{{range $i, $v := .sessKeywords}}{{$v}},{{end}}" data-role="tagsinput" />
+                            <input type="text" id="keyWords" value="{{range $i, $v := .userFilterKeywords}}{{$v}},{{end}}"
+                                   data-role="tagsinput" {{if not $root.user}}disabled{{end}} />
                             <div class="clearfix"> </div>
-                            <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn" class="caTheme btn btn-blue">Применить</button>
-                            <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn1" class="caTheme btn btn-default">Очистить</button>
+                            <button type="button" style="margin-top:20px;" id="filterSaveBtn" class="caTheme btn btn-blue" {{if not $root.user}}disabled{{end}}>Применить</button>
+                            <button type="button" style="margin-top:20px;" id="filterResetBtn" class="caTheme btn btn-default" {{if not $root.user}}disabled{{end}}>Очистить</button>
                             <div class="clearfix"> </div>
                         </div>
                     </div>
-                    <div class="panel panel-default">
+                    <div class="caTheme panel panel-default">
                         <div class="panel-heading">
                             Новости
                         </div>
                         <div class="panel-body news">
+                            <div>
+                                <div class="date">23.07.2017</div>
+                                <div class="content">
+                                    Добавлена регистрация & авторизация, переделан фильтр по категориям и добавлен фильтр по ключевому слову.
+                                    Теперь фильтры доступны только зарегистрированным пользователям.
+                                </div>
+                            </div>
                             <div>
                                 <div class="date">12.07.2017</div>
                                 <div class="content">

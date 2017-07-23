@@ -72,13 +72,12 @@ func InitRoutes() {
 
 	staticRoutes(r)
 	authRoutes(r)
+	settingsRoutes(r)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard/", http.StatusFound)
 	})
 	r.Mount("/dashboard/", dashboardResource{}.Routes())
-	r.Post("/saveFilter", saveFilter)
-	r.Post("/saveKeyWords", saveKeyWords)
 
 	panic(http.ListenAndServe(":8080", r))
 }

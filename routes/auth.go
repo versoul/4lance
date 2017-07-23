@@ -3,6 +3,8 @@ package routes
 import (
 	"encoding/json"
 	"github.com/pressly/chi"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"versoul/4lance/auth"
 	"versoul/4lance/config"
@@ -69,6 +71,45 @@ func registerAction(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))
 	} else {
 		a.SendConfirmationEmail(id)
+
+		mgoSession, err := mgo.Dial(conf.DbHost)
+		if err != nil {
+			panic(err)
+		}
+		defer mgoSession.Close()
+		dbC := mgoSession.DB(conf.DbName).C("categories")
+		// Query All
+		var categories []map[string]interface{}
+		err = dbC.Find(nil).Select(bson.M{"_id": 0}).All(&categories)
+		if err != nil {
+			panic(err)
+		}
+
+		var allCategories = []string{}
+		for _, row := range categories[0] {
+			row := row.([]interface{})
+			for _, c := range row {
+				cr := c.(map[string]interface{})
+				childs := cr["childs"].([]interface{})
+				for _, child := range childs {
+					child1 := child.(map[string]interface{})
+					tid := child1["tid"].(string)
+					allCategories = append(allCategories, tid)
+				}
+			}
+		}
+
+		db := mgoSession.DB(conf.DbName).C("users")
+
+		query := bson.M{"_id": id}
+		change := bson.M{"$set": bson.M{
+			"filter": bson.M{
+				"categories": allCategories,
+				"keywords":   []string{},
+			},
+		},
+		}
+		err = db.Update(query, change)
 		w.Write([]byte("{\"status\":\"ok\"}"))
 	}
 }

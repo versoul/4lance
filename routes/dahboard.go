@@ -91,10 +91,15 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 
 	sessUser := sess.Get("user")
 	var userData = map[string]interface{}{}
+	var userFilter = map[string]interface{}{}
+	var userFilterCategories = []interface{}{}
+	var userFilterKeywords = []interface{}{}
 	if sessUser != nil {
 		userData = getUserData(sessUser.(string))
+		userFilter = userData["filter"].(map[string]interface{})
+		userFilterCategories = userFilter["categories"].([]interface{})
+		userFilterKeywords = userFilter["keywords"].([]interface{})
 	}
-	fmt.Println(userData)
 
 	page, err := strconv.Atoi(chi.URLParam(r, "page"))
 	if err != nil || page < 1 {
@@ -110,8 +115,22 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
-	if false {
-		//err = db.Find(bson.M{"projectCategories": bson.M{"$in": sessCategories} /*, "projectDescription": bson.M{"$regex": bson.RegEx{`python`, "gmi"}}*/}).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+	if sessUser != nil {
+		var query = bson.M{}
+		bsonCategories := bson.M{"projectCategories": bson.M{"$in": userFilterCategories}}
+		if len(userFilterKeywords) > 0 {
+			var bsonKeywords = []bson.M{}
+			for _, keyword := range userFilterKeywords {
+				bsonKeywords = append(bsonKeywords, bson.M{"projectTitle": bson.M{"$regex": bson.RegEx{`\s`+keyword.(string)+`\s`, "gmi"}}})
+				bsonKeywords = append(bsonKeywords, bson.M{"projectDescription": bson.M{"$regex": bson.RegEx{keyword.(string), "gmi"}}})
+			}
+			bsonOrKeywords := bson.M{"$or": bsonKeywords}
+			query = bson.M{"$and": []bson.M{bsonCategories, bsonOrKeywords}}
+		} else {
+			query = bsonCategories
+		}
+
+		err = db.Find(query).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
 	}
@@ -128,7 +147,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Сравниваем категории с выбранными в сессии, помечаем для интерфейса
-	/*for _, row := range categories[0] {
+	for _, row := range categories[0] {
 		row, ok := row.([]interface{})
 		if ok {
 			for _, c := range row {
@@ -137,17 +156,15 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 				for _, child := range childs {
 					child1 := child.(map[string]interface{})
 					tid := child1["tid"].(string)
-					if sessCategories != nil {
-						for _, v := range sessCategories.([]string) {
-							if v == tid {
-								child1["activ"] = true
-							}
+					for _, v := range userFilterCategories {
+						if v.(string) == tid {
+							child1["activ"] = true
 						}
 					}
 				}
 			}
 		}
-	}*/
+	}
 
 	//Get data count
 	cnt, err := db.Find(nil).Count()
@@ -183,12 +200,12 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 	}
 	//Render template
 	renderTemplate(w, "main", map[string]interface{}{
-		"Error":      "Main Website",
-		"projects":   results,
-		"categories": categories,
-		"count":      cnt,
-		"pagination": pagination,
-		//"sessKeywords": sessKeywords,
-		"user": userData,
+		"Error":              "Main Website",
+		"projects":           results,
+		"categories":         categories,
+		"count":              cnt,
+		"pagination":         pagination,
+		"userFilterKeywords": userFilterKeywords,
+		"user":               userData,
 	})
 }
