@@ -5,8 +5,9 @@ $( document ).ready(function() {
         enableClickableOptGroups: true,
         includeSelectAllOption: true,
         enableFiltering: true,
-        buttonWidth: '400px',
+        buttonWidth: '100%',
         maxHeight: 400,
+        dropRight: true,
         numberDisplayed: 0,
         selectAllText: 'Выбрать все категории',
         nonSelectedText: 'Выбрать категории',
@@ -16,8 +17,13 @@ $( document ).ready(function() {
         filterBehavior: 'text',
         enableCaseInsensitiveFiltering: true,
         numberDisplayed: 0,
+        onChange: function(element, checked) {
+            console.log("CHANGED", element.val(), checked)
+        }
     });
-
+    $( "div.projectsFilter" ).tooltip({
+        track:true
+    })
 
     $("#projectsList tr").click(function(e){
         if(!e.ctrlKey){

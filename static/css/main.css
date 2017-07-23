@@ -14,9 +14,19 @@ body {
     font-size:14px;
     margin:4px 0 0 0;
 }
-
-#settingsModal .modal-body {
-    /*padding: 0;*/
+.navbar-brand h1{
+    font-size:22px;
+    line-height:15px;
+    margin:0;
+}
+.navbar-brand h1 span {
+    font-size:14px;
+}
+.modal-header h4 h2 {
+    font-size:18px;
+    margin-top:0;
+    margin-bottom:0;
+    line-height: 1.42857143;
 }
 
 .news .date {
@@ -38,22 +48,17 @@ body {
     color:#777;
 }
 
-
+.bootstrap-tagsinput{
+    width:100%;
+}
 #formErr {
     padding:7px;
     display:none;
     text-align:center;
 }
-.navbar-brand h1{
-    font-size:22px;
-    line-height:15px;
-    margin:0;
-}
-.navbar-brand h1 span {
-    font-size:14px;
-}
 .categories-container {
     margin-bottom:25px;
+    min-height:64px;
 }
 
 .categories-container>p img {
@@ -64,7 +69,10 @@ body {
     padding-left:5px;
     font-weight:bold;
 }
-
+.categoriesMultiselect {
+    width:0px;
+    display:none;
+}
 
 /*customize bootstrap multiselect*/
 ul.multiselect-container {
@@ -534,7 +542,7 @@ ul.multiselect-container li.multiselect-group {
 /* line 78, /home/andrei/core-admin-release/core-admin/source/stylesheets/buttons.scss */
 
 
-.caTheme .input-group, .caTheme .input-group {
+.caTheme.input-group {
     height: 36px;
     line-height: 36px;
     -webkit-box-sizing: border-box;
@@ -543,16 +551,13 @@ ul.multiselect-container li.multiselect-group {
     width: 100%;
     position: relative;
     z-index: 1; }
-/* line 60, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group .input-group-addon i, .caTheme .input-group .input-group-addon i {
-    line-height: 26px; }
-/* line 71, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group *, .caTheme .input-group * {
+.caTheme.input-group .input-group-addon i {
+    line-height: 22px; }
+.caTheme.input-group * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box; }
-/* line 78, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group a.input-group-addon, .caTheme .input-group span.input-group-addon, .caTheme .input-group a.input-group-addon, .caTheme .input-group span.input-group-addon {
+.caTheme.input-group a.input-group-addon, .caTheme.input-group span.input-group-addon {
     min-width: 36px;
     color: #5a6573;
     position: absolute;
@@ -573,11 +578,9 @@ ul.multiselect-container li.multiselect-group {
     padding-left: 10px;
     padding-right: 10px;
 }
-/* line 90, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group a.input-group-addon:active, .caTheme .input-group span.input-group-addon:active, .caTheme .input-group a.input-group-addon:active, .caTheme .input-group span.input-group-addon:active {
+.caTheme.input-group a.input-group-addon:active, .caTheme.input-group span.input-group-addon:active {
     background: #eee; }
-/* line 95, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group ul.input-group-addon, .caTheme .input-group ul.input-group-addon {
+.caTheme.input-group ul.input-group-addon {
     list-style: none;
     position: absolute;
     z-index: 2;
@@ -588,32 +591,27 @@ ul.multiselect-container li.multiselect-group {
     height: 100%;
     top: 1px;
     right: 2px; }
-/* line 108, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group ul.input-group-addon li, .caTheme .input-group ul.input-group-addon li {
+.caTheme.input-group ul.input-group-addon li {
     float: left;
     margin-left: 10px;
     line-height: 32px;
     height: 32px; }
-/* line 114, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group ul.input-group-addon li a, .caTheme .input-group ul.input-group-addon li button, .caTheme .input-group ul.input-group-addon li a, .caTheme .input-group ul.input-group-addon li button {
+.caTheme.input-group ul.input-group-addon li a, .caTheme.input-group ul.input-group-addon li button {
     vertical-align: middle; }
-/* line 117, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group ul.input-group-addon li a.btn, .caTheme .input-group ul.input-group-addon li button.btn, .caTheme .input-group ul.input-group-addon li a.btn, .caTheme .input-group ul.input-group-addon li button.btn {
+.caTheme.input-group ul.input-group-addon li a.btn, .caTheme.input-group ul.input-group-addon li button.btn {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     -ms-border-radius: 3px;
     -o-border-radius: 3px;
     border-radius: 3px; }
-/* line 122, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group ul.input-group-addon li .btn, .caTheme .input-group ul.input-group-addon li .btn {
+.caTheme.input-group ul.input-group-addon li .btn {
     padding: 0;
     line-height: 25px;
     height: 25px;
     padding-left: 10px;
     padding-right: 10px;
     margin-right: 5px; }
-/* line 133, /home/andrei/core-admin-release/core-admin/source/stylesheets/form_elements.scss */
-.caTheme .input-group input[type="text"], .caTheme .input-group input[type="password"], .caTheme .input-group input[type="email"], .caTheme .input-group input[type="number"], .caTheme .input-group input[type="text"], .caTheme .input-group input[type="password"], .caTheme .input-group input[type="email"], .caTheme .input-group input[type="number"] {
+.caTheme.input-group input[type="text"], .caTheme.input-group input[type="password"], .caTheme.input-group input[type="email"], .caTheme.input-group input[type="number"] {
     height: 36px;
     z-index: 1;
     -webkit-border-radius: 4px;
@@ -621,7 +619,7 @@ ul.multiselect-container li.multiselect-group {
     -ms-border-radius: 4px;
     -o-border-radius: 4px;
     border-radius: 4px; }
-.caTheme .input-group input[type="text"], .caTheme .input-group input[type="password"], .caTheme .input-group input[type="email"], .caTheme .input-group input[type="number"] {
+.caTheme.input-group input[type="text"], .caTheme.input-group input[type="password"], .caTheme.input-group input[type="email"], .caTheme.input-group input[type="number"] {
     padding-left: 45px; }
 
 .caTheme.alert-info {

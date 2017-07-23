@@ -50,27 +50,35 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel panel-default panel-invisible">
+                    <div class="caTheme panel panel-default projectsFilter" title="Фильтр доступен зарегистрированным пользователям">
                         <div class="panel-heading">
                             Фильтр
                         </div>
                         <div class="panel-body">
+                            {{range $i, $v := index .categories 0}}
+                            {{if ne $i "_id"}}
+                            <div class="categories-container">
+                                <p><img src='/static/img/{{siteToIcon $i}}' alt="" /><span>{{siteToName $i}}</span></p>
+                                <select class="categoriesMultiselect" multiple="multiple">
+                                    {{range $ii, $vv := $v}}
+                                    <optgroup label="{{$vv.name}}">
+                                        {{range $iii, $child := $vv.childs}}
+                                        <option value="{{$child.tid}}" {{if $child.activ}}selected="selected"{{end}}>{{$child.name}}</option>
+                                        {{end}}
+                                    </optgroup>
+                                    {{end}}
+                                </select>
+                            </div>
+                            {{end}}
+                            {{end}}
+                            <hr/>
                             <div>Ключевые слова:</div>
 
                             <input type="text" id="keyWords" value="{{range $i, $v := .sessKeywords}}{{$v}},{{end}}" data-role="tagsinput" />
                             <div class="clearfix"> </div>
-                            <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn" class="btn btn-primary">Применить</button>
+                            <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn" class="caTheme btn btn-blue">Применить</button>
+                            <button type="button" style="margin-top:20px;" id="keyWordsAcceptBtn1" class="caTheme btn btn-default">Очистить</button>
                             <div class="clearfix"> </div>
-                            <button type="button" style="margin-top:20px;" class="btn btn-default" data-toggle="modal" data-target="#settingsModal">
-                                <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
-                                Настройка бирж
-                            </button>
-                            <button type="button" style="margin-top:20px;" class="btn btn-default" data-toggle="modal" data-target="#settingsModal2">
-                                <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
-                                Настройка бирж2
-                            </button>
-                            <div class="clearfix"> </div>
-
                         </div>
                     </div>
                     <div class="panel panel-default">
@@ -106,97 +114,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
                 <a target="_blank" class="btn btn-primary" id="toProjectBtn" href="#">Перейти</a>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="settingsModal" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Настройки</h4>
-            </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs">
-                    <!--<li class="active"><a href="#settings" data-toggle="tab">Настройки</a></li>-->
-                    <li class="active"><a href="#fl" data-toggle="tab">fl</a></li>
-                    <li><a href="#wl" data-toggle="tab">wl</a></li>
-                </ul>
-
-                <div class="tab-content">
-                    <!--<div class="tab-pane active" id="settings">
-
-                    </div>-->
-                    {{range $i, $v := index .categories 0}}
-                    {{if ne $i "_id"}}
-                    <div class='tab-pane {{if eq $i "fl"}}active{{end}}' id="{{$i}}">
-                        <h4>Категории</h4>
-                        <div class="panel-group categoriesContainer">
-                            {{range $ii, $vv := $v}}
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a data-toggle="collapse" data-parent="#accordion" href="#{{$vv.tid}}">
-                                            {{$vv.name}}
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="{{$vv.tid}}" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        {{range $iii, $child := $vv.childs}}
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" value="{{$child.tid}}" {{if $child.activ}}checked{{end}}>
-                                                {{$child.name}}
-                                            </label>
-                                        </div>
-                                        {{end}}
-                                    </div>
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
-                    </div>
-                    {{end}}
-                    {{end}}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-                <button id="settingsModalSaveBtn" type="button" class="btn btn-primary">Сохранить</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="settingsModal2" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Фильтр категорий</h4>
-            </div>
-            <div class="modal-body">
-                {{range $i, $v := index .categories 0}}
-                {{if ne $i "_id"}}
-                <div class="categories-container">
-                    <p><img src='/static/img/{{siteToIcon $i}}' alt="" /><span>{{siteToName $i}}</span></p>
-                    <select class="categoriesMultiselect" multiple="multiple">
-                        {{range $ii, $vv := $v}}
-                        <optgroup label="{{$vv.name}}">
-                            {{range $iii, $child := $vv.childs}}
-                            <option value="{{$child.tid}}" {{if $child.activ}}selected="selected"{{end}}>{{$child.name}}</option>
-                            {{end}}
-                        </optgroup>
-                        {{end}}
-                    </select>
-                </div>
-                {{end}}
-                {{end}}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-                <button id="settingsModalSaveBtn2" type="button" class="btn btn-primary">Сохранить</button>
             </div>
         </div>
     </div>
