@@ -99,7 +99,7 @@ func (self *singleton) SendConfirmationEmail(id interface{}) error {
 		}
 
 		m := gomail.NewMessage()
-		m.SetHeader("From", self.config["mailUser"].(string))
+		m.SetHeader("From", "4lance.ru <"+self.config["mailUser"].(string)+">")
 		m.SetHeader("To", email)
 		m.SetHeader("Subject", "Подтвердите ваш email")
 		m.SetBody("text/html", "<div style='padding:20px 0; font-size:15px;'>"+

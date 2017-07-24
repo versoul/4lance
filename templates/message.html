@@ -1,6 +1,6 @@
 {{define "content"}}
 <div class="container text-center">
-    <div class="caTheme alert alert-{{.Type}}">{{.Message}}</div>
+    <div class="caTheme alert alert-{{.Type}}">{{toHtml .Message}}</div>
 </div>
 {{end}}
 

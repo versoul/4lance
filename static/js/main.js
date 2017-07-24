@@ -1,13 +1,16 @@
 
 $( document ).ready(function() {
-
+    var dropRight = true;
+    if($(window).width() < 977){
+        dropRight = false;
+    }
     $('.categoriesMultiselect').multiselect({
         enableClickableOptGroups: true,
         includeSelectAllOption: true,
         enableFiltering: true,
         buttonWidth: '100%',
         maxHeight: 400,
-        dropRight: true,
+        dropRight: dropRight,
         numberDisplayed: 0,
         selectAllText: 'Выбрать все категории',
         nonSelectedText: 'Выбрать категории',

@@ -41,8 +41,9 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 }
 func confirmMessagePage(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "message", map[string]interface{}{
-		"Type":    "info",
-		"Message": "На ваш email выслано письмо для активации аккаунта. Перейдите по ссылке в нем.",
+		"Type": "info",
+		"Message": "На ваш email выслано письмо для активации аккаунта. Перейдите по ссылке в нем." +
+			"<br/>Письмо может попасть в папку \"спам\" по ошибке, проверьте там.",
 	})
 }
 func confirmEmailPage(w http.ResponseWriter, r *http.Request) {
