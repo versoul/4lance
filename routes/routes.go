@@ -6,7 +6,9 @@ import (
 	"html/template"
 	"net/http"
 
+	"errors"
 	"github.com/astaxie/beego/session"
+	"net"
 	"os"
 	"path/filepath"
 	"versoul/4lance/templateHelpers"
@@ -16,13 +18,42 @@ var (
 	localIp        = "192.168.1.91"
 	globalSessions *session.Manager
 )
-var EcternalIp string
 
-func minus(a, b int64) string {
-	fmt.Println(a)
-	fmt.Println(b)
-	return "12"
-	//return strconv.FormatInt(a-b, 10)
+func externalIP() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", errors.New("are you connected to the network?")
 }
 
 func init() {
@@ -64,23 +95,7 @@ func renderTemplate(w http.ResponseWriter, name string, pageData map[string]inte
 	//Отображаем
 	tpl.ExecuteTemplate(w, "base", pageData)
 }
-func InitRoutes() {
-	r := chi.NewRouter()
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "static")
-	r.FileServer("/static", http.Dir(filesDir))
 
-	staticRoutes(r)
-	authRoutes(r)
-	settingsRoutes(r)
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/dashboard/", http.StatusFound)
-	})
-	r.Mount("/dashboard/", dashboardResource{}.Routes())
-
-	panic(http.ListenAndServe(":8080", r))
-}
 func staticRoutes(r chi.Router) {
 	r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/favicon.ico")
@@ -91,4 +106,22 @@ func staticRoutes(r chi.Router) {
 	r.Get("/yandex_87613e29f1d00477.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/yandex_87613e29f1d00477.html")
 	})
+}
+
+func InitRoutes() {
+	r := chi.NewRouter()
+	workDir, _ := os.Getwd()
+	filesDir := filepath.Join(workDir, "static")
+	r.FileServer("/static", http.Dir(filesDir))
+
+	staticRoutes(r)
+	authRoutes(r)
+	settingsRoutes(r)
+	dashboardRoutes(r)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/dashboard/", http.StatusFound)
+	})
+
+	panic(http.ListenAndServe(":8080", r))
 }

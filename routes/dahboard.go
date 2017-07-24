@@ -1,64 +1,22 @@
 package routes
 
 import (
-	"errors"
 	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	//"html/template"
-	"net"
 	"net/http"
 	"strconv"
-	//"time"
 )
 
 var (
 	projectsPerPage = 50
 )
 
-type dashboardResource struct{}
-
-func init() {
-
+func dashboardRoutes(r chi.Router) {
+	r.Get("/dashboard/:page", dashboardPage)
 }
 
-func externalIP() (string, error) {
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return "", err
-	}
-	for _, iface := range ifaces {
-		if iface.Flags&net.FlagUp == 0 {
-			continue // interface down
-		}
-		if iface.Flags&net.FlagLoopback != 0 {
-			continue // loopback interface
-		}
-		addrs, err := iface.Addrs()
-		if err != nil {
-			return "", err
-		}
-		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
-			if ip == nil || ip.IsLoopback() {
-				continue
-			}
-			ip = ip.To4()
-			if ip == nil {
-				continue // not an ipv4 address
-			}
-			return ip.String(), nil
-		}
-	}
-	return "", errors.New("are you connected to the network?")
-}
 func getUserData(userEmail string) map[string]interface{} {
 	var result map[string]interface{}
 	mgoSession, err := mgo.Dial(conf.DbHost)
@@ -76,16 +34,7 @@ func getUserData(userEmail string) map[string]interface{} {
 	return result
 }
 
-// Routes creates a REST router for the todos resource
-func (rs dashboardResource) Routes() chi.Router {
-	r := chi.NewRouter()
-	// r.Use() // some middleware..
-
-	r.Get("/:page", rs.List) // GET /todos - read a list of todos
-	return r
-}
-
-func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
+func dashboardPage(w http.ResponseWriter, r *http.Request) {
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
 
@@ -121,7 +70,7 @@ func (rs dashboardResource) List(w http.ResponseWriter, r *http.Request) {
 		if len(userFilterKeywords) > 0 {
 			var bsonKeywords = []bson.M{}
 			for _, keyword := range userFilterKeywords {
-				bsonKeywords = append(bsonKeywords, bson.M{"projectTitle": bson.M{"$regex": bson.RegEx{`\s`+keyword.(string)+`\s`, "gmi"}}})
+				bsonKeywords = append(bsonKeywords, bson.M{"projectTitle": bson.M{"$regex": bson.RegEx{`\s` + keyword.(string) + `\s`, "gmi"}}})
 				bsonKeywords = append(bsonKeywords, bson.M{"projectDescription": bson.M{"$regex": bson.RegEx{keyword.(string), "gmi"}}})
 			}
 			bsonOrKeywords := bson.M{"$or": bsonKeywords}
