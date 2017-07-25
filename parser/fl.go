@@ -37,6 +37,7 @@ func (self *flParser) parse() {
 	c := session.DB(self.dbName).C(self.collectionName)
 	doc, err := goquery.NewDocument(self.site + "/projects/?kind=1")
 	if err != nil {
+		fmt.Println("Ошибка загрузки страницы!")
 		fmt.Println(err)
 		return
 	}
@@ -83,7 +84,11 @@ func (self *flParser) parse() {
 func (self *flParser) parseOne(url string, id string) {
 
 	doc, err := goquery.NewDocument(self.site + url)
-	checkErr(err)
+	if err != nil {
+		fmt.Println("Ошибка загрузки страницы!")
+		fmt.Println(err)
+		return
+	}
 	descrElem := doc.Find("#projectp" + id)
 	projectDescription, err := descrElem.Html()
 	checkErr(err)
