@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 var (
@@ -35,10 +36,13 @@ func getUserData(userEmail string) map[string]interface{} {
 }
 
 func dashboardPage(w http.ResponseWriter, r *http.Request) {
+	timeStart := time.Now().UnixNano() / 1000000
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
 
 	sessUser := sess.Get("user")
+	fmt.Println("SESS")
+	fmt.Println(sessUser)
 	var userData = map[string]interface{}{}
 	var userFilter = map[string]interface{}{}
 	var userFilterCategories = []interface{}{}
@@ -61,6 +65,9 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer session.Close()
 	//Get data
+	var timeProcess1 int64
+	var timeProcess2 int64
+
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
@@ -80,13 +87,30 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = db.Find(query).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+		timeProcess1 = time.Now().UnixNano()/1000000 - timeStart
+		m := map[string]interface{}{}
+		err = db.Find(query).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).Explain(m)
+		if err == nil {
+			fmt.Printf("Explain: milis=%v docsExamined=%v \n", m["executionStats"].(map[string]interface{})["executionTimeMillis"].(int),
+				m["executionStats"].(map[string]interface{})["totalDocsExamined"].(int))
+		}
+		timeProcess2 = time.Now().UnixNano()/1000000 - timeStart - timeProcess1
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
+		m := map[string]interface{}{}
+		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).Explain(m)
+		if err == nil {
+			fmt.Printf("Explain: milis=%v docsExamined=%v \n", m["executionStats"].(map[string]interface{})["executionTimeMillis"].(int),
+				m["executionStats"].(map[string]interface{})["totalDocsExamined"].(int))
+		}
 	}
 
 	if err != nil {
 		panic(err)
 	}
+
+	//timeProcess2 := time.Now().UnixNano()/1000000 - timeStart - timeProcess1
+
 	dbC := session.DB("4lance").C("categories")
 	// Query All
 	var categories []map[string]interface{}
@@ -94,6 +118,8 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
+	timeProcess3 := time.Now().UnixNano()/1000000 - timeStart - timeProcess2 - timeProcess1
 
 	//Сравниваем категории с выбранными в сессии, помечаем для интерфейса
 	for _, row := range categories[0] {
@@ -114,6 +140,7 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	timeProcess4 := time.Now().UnixNano()/1000000 - timeStart - timeProcess3 - timeProcess2 - timeProcess1
 
 	//Get data count
 	cnt, err := db.Find(nil).Count()
@@ -147,6 +174,16 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 		"prev":  prev,
 		"next":  next,
 	}
+
+	timeProcess1Str := strconv.FormatInt(timeProcess1, 10)
+	fmt.Println("Before main query time = " + timeProcess1Str + "ms")
+	timeProcess2Str := strconv.FormatInt(timeProcess2, 10)
+	fmt.Println("After main query time = " + timeProcess2Str + "ms")
+	timeProcess3Str := strconv.FormatInt(timeProcess3, 10)
+	fmt.Println("Before loop time = " + timeProcess3Str + "ms")
+	timeProcess4Str := strconv.FormatInt(timeProcess4, 10)
+	fmt.Println("After loop time = " + timeProcess4Str + "ms")
+
 	//Render template
 	renderTemplate(w, "main", map[string]interface{}{
 		"Error":              "Main Website",

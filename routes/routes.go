@@ -62,6 +62,7 @@ func init() {
 		EnableSetCookie: true,
 		Gclifetime:      86400,
 		CookieLifeTime:  86400,
+		Maxlifetime:     86400,
 		Secure:          false,
 		ProviderConfig:  "./tmp",
 	}
