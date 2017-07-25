@@ -91,17 +91,11 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 		m := map[string]interface{}{}
 		err = db.Find(query).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).Explain(m)
 		if err == nil {
-			fmt.Printf("Explain: milis=%v docsExamined=%v \n", m["executionStats"].(map[string]interface{})["executionTimeMillis"].(int),
-				m["executionStats"].(map[string]interface{})["totalDocsExamined"].(int))
+			fmt.Println(m)
 		}
 		timeProcess2 = time.Now().UnixNano()/1000000 - timeStart - timeProcess1
 	} else {
 		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).All(&results)
-		m := map[string]interface{}{}
-		err = db.Find(nil).Sort("-projectDate").Skip((page - 1) * projectsPerPage).Limit(projectsPerPage).Explain(m)
-		if err == nil {
-			fmt.Printf("Explain: milis=%v docsExamined=%v \n", m["executionStats"])
-		}
 	}
 
 	if err != nil {
