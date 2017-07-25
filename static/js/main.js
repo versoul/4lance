@@ -44,7 +44,6 @@ $( document ).ready(function() {
             modal.find(".modal-title").html(lnk.html());
             modal.find(".modal-body").html(row.data("description"));
             modal.find("#toProjectBtn").attr("href", lnk.attr("href"));
-            console.log("BB", modal.find("#toProjectBtn"))
             modal.modal('show');
         }
     });
@@ -180,5 +179,24 @@ $( document ).ready(function() {
                 alert("Sorry. Server unavailable. ");
             });
         }
+    });
+
+
+    /*********************/
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+    var socket = io({path: '/socket.io'});
+    socket.on('connect', function() {
+        console.log('WID = ', socket.id,  getCookie('sessionid'))
+        var conf = {sid:'333'};
+        //Session id from cockie
+        socket.emit('conn', JSON.stringify(conf));
+    });
+    socket.on('msg', function(msg, sendAckCb){
+        console.log('msg', msg)
+        sendAckCb("ok");
     });
 });
