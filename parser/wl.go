@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html/charset"
 	"gopkg.in/mgo.v2"
@@ -38,7 +39,8 @@ func (self *wlParser) parse() {
 	c := session.DB(self.dbName).C(self.collectionName)
 	resp, err := http.Get(self.site + "/jobs/?type=project")
 	if err != nil {
-		panic(err)
+		fmt.Println("Ошибка загрузки страницы!")
+		fmt.Println(err)
 		return
 	}
 	defer resp.Body.Close()
@@ -104,7 +106,9 @@ func (self *wlParser) parseOne(url string, id string) {
 
 	resp, err := http.Get(self.site + url)
 	if err != nil {
-		checkErr(err)
+		fmt.Println("Ошибка загрузки страницы!")
+		fmt.Println(err)
+		return
 	}
 	defer resp.Body.Close()
 	utf8, err := charset.NewReader(resp.Body, resp.Header.Get("Content-Type"))
