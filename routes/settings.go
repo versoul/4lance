@@ -27,17 +27,19 @@ func settingsRoutes(r chi.Router) {
 }
 
 func filterSave(w http.ResponseWriter, r *http.Request) {
-	sess, _ := globalSessions.SessionStart(w, r)
-	defer sess.SessionRelease(w)
 	data := Data{}
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		panic(err)
 	}
 
-	sessUser := sess.Get("user")
+	var userData = map[string]interface{}{}
+	udata, authOk := a.CheckAuthReq(r)
+	if authOk {
+		userData = udata
+	}
 
-	if sessUser == nil {
+	if !authOk {
 		w.Write([]byte("{\"status\":\"err\", \"error\":\"Нет! Нет! Только зарегистрированные!\"}"))
 	} else {
 		mgoSession, err := mgo.Dial(conf.DbHost)
@@ -47,7 +49,6 @@ func filterSave(w http.ResponseWriter, r *http.Request) {
 		defer mgoSession.Close()
 		db := mgoSession.DB(conf.DbName).C("users")
 
-		query := bson.M{"email": sessUser}
 		change := bson.M{"$set": bson.M{
 			"filter": bson.M{
 				"categories": data.Categories,
@@ -55,21 +56,22 @@ func filterSave(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		}
-		err = db.Update(query, change)
+		err = db.UpdateId(userData["_id"], change)
 		if err != nil {
-			w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))
+			w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "888\"}"))
 		} else {
 			w.Write([]byte("{\"status\":\"ok\"}"))
 		}
 	}
 }
 func filterReset(w http.ResponseWriter, r *http.Request) {
-	sess, _ := globalSessions.SessionStart(w, r)
-	defer sess.SessionRelease(w)
+	var userData = map[string]interface{}{}
+	udata, authOk := a.CheckAuthReq(r)
+	if authOk {
+		userData = udata
+	}
 
-	sessUser := sess.Get("user")
-
-	if sessUser == nil {
+	if !authOk {
 		w.Write([]byte("{\"status\":\"err\", \"error\":\"Нет! Нет! Только зарегистрированные!\"}"))
 	} else {
 		mgoSession, err := mgo.Dial(conf.DbHost)
@@ -102,7 +104,6 @@ func filterReset(w http.ResponseWriter, r *http.Request) {
 
 		db := mgoSession.DB(conf.DbName).C("users")
 
-		query := bson.M{"email": sessUser}
 		change := bson.M{"$set": bson.M{
 			"filter": bson.M{
 				"categories": allCategories,
@@ -110,7 +111,7 @@ func filterReset(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		}
-		err = db.Update(query, change)
+		err = db.UpdateId(userData["_id"], change)
 		if err != nil {
 			w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))
 		} else {

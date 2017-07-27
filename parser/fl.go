@@ -145,4 +145,6 @@ func (self *flParser) parseOne(url string, id string) {
 	if err != nil {
 		panic(err)
 	}
+
+	//delivery.Deliver()
 }

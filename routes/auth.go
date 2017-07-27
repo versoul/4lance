@@ -12,7 +12,11 @@ import (
 
 var (
 	conf = config.GetInstance()
-	a    = auth.GetInstance("mongodb", map[string]interface{}{
+	a    = auth.GetInstance()
+)
+
+func init() {
+	a.Configure("mongodb", map[string]interface{}{
 		"dbHost":   conf.DbHost,
 		"dbName":   conf.DbName,
 		"mailHost": conf.MailHost,
@@ -20,7 +24,7 @@ var (
 		"mailUser": conf.MailUser,
 		"mailPass": conf.MailPass,
 	})
-)
+}
 
 func authRoutes(r chi.Router) {
 	r.Get("/register/", registerPage)
@@ -120,19 +124,14 @@ func loginAction(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	userData, err := a.LoginUser(data["email"].(string), data["password"].(string))
+	_, err = a.LoginUser(w, data["email"].(string), data["password"].(string))
 	if err != nil {
 		w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))
 	} else {
-		sess, _ := globalSessions.SessionStart(w, r)
-		defer sess.SessionRelease(w)
-		sess.Set("user", userData["email"].(string))
 		w.Write([]byte("{\"status\":\"ok\"}"))
 	}
 }
 func logoutAction(w http.ResponseWriter, r *http.Request) {
-	sess, _ := globalSessions.SessionStart(w, r)
-	defer sess.SessionRelease(w)
-	sess.Flush()
+	a.LogoutUser(w)
 	http.Redirect(w, r, "/dashboard/", 302)
 }

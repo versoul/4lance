@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -17,36 +16,14 @@ func dashboardRoutes(r chi.Router) {
 	r.Get("/dashboard/:page", dashboardPage)
 }
 
-func getUserData(userEmail string) map[string]interface{} {
-	var result map[string]interface{}
-	mgoSession, err := mgo.Dial(conf.DbHost)
-	if err != nil {
-		panic(err)
-	}
-	defer mgoSession.Close()
-	db := mgoSession.DB(conf.DbName).C("users")
-
-	err = db.Find(bson.M{"email": userEmail}).One(&result)
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	return result
-}
-
 func dashboardPage(w http.ResponseWriter, r *http.Request) {
-	sess, _ := globalSessions.SessionStart(w, r)
-	defer sess.SessionRelease(w)
-
-	sessUser := sess.Get("user")
-	fmt.Println("SESS")
-	fmt.Println(sessUser)
 	var userData = map[string]interface{}{}
 	var userFilter = map[string]interface{}{}
 	var userFilterCategories = []interface{}{}
 	var userFilterKeywords = []interface{}{}
-	if sessUser != nil {
-		userData = getUserData(sessUser.(string))
+	data, authOk := a.CheckAuthReq(r)
+	if authOk {
+		userData = data
 		userFilter = userData["filter"].(map[string]interface{})
 		userFilterCategories = userFilter["categories"].([]interface{})
 		userFilterKeywords = userFilter["keywords"].([]interface{})
@@ -67,7 +44,7 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 	db := session.DB("4lance").C("projects")
 	// Query All
 	var results []map[string]interface{}
-	if sessUser != nil {
+	if authOk {
 		var query = bson.M{}
 		bsonCategories := bson.M{"projectCategories": bson.M{"$in": userFilterCategories}}
 		if len(userFilterKeywords) > 0 {

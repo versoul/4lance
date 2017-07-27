@@ -5,10 +5,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/nu7hatch/gouuid"
 	"gopkg.in/gomail.v2"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"net/http"
 	"sync"
+	"time"
 )
 
 type singleton struct {
@@ -25,16 +28,16 @@ func getMD5Hash(text string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func GetInstance(providerName string, config map[string]interface{}) *singleton {
+func GetInstance() *singleton {
 	once.Do(func() {
-		instance = &singleton{
-			provider: providerName,
-			config:   config,
-		}
+		instance = &singleton{}
 	})
 	return instance
 }
-
+func (self *singleton) Configure(providerName string, config map[string]interface{}) {
+	self.provider = providerName
+	self.config = config
+}
 func (self *singleton) RegisterUser(email string, pass string) (interface{}, error) {
 	var id interface{}
 	switch self.provider {
@@ -151,7 +154,7 @@ func (self *singleton) ConfirmEmail(confirmationHash string) error {
 	return nil
 }
 
-func (self *singleton) LoginUser(email string, pass string) (map[string]interface{}, error) {
+func (self *singleton) LoginUser(w http.ResponseWriter, email string, pass string) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	switch self.provider {
 	case "mongodb":
@@ -178,8 +181,66 @@ func (self *singleton) LoginUser(email string, pass string) (map[string]interfac
 		if getMD5Hash(pass) != result["pass"].(string) {
 			return nil, errors.New("Пароль не верный")
 		}
+
+		sid, err := uuid.NewV4()
+		if err != nil {
+			panic(err)
+		}
+		change := bson.M{"$set": bson.M{
+			"sid": sid.String(),
+		},
+		}
+		err = db.UpdateId(result["_id"], change)
+
+		expire := time.Now().AddDate(0, 1, 0)
+		cookie := http.Cookie{"sid", sid.String(), "/", "",
+			expire, "", 86400, false, false, "", nil}
+		http.SetCookie(w, &cookie)
 	}
-	delete(result, "_id")
 	delete(result, "pass")
 	return result, nil
+}
+
+func (self *singleton) LogoutUser(w http.ResponseWriter) {
+	expire := time.Now().AddDate(-1, 0, 0)
+	cookie := http.Cookie{"sid", "", "/", "",
+		expire, "", -1, false, false, "", nil}
+	http.SetCookie(w, &cookie)
+}
+
+func (self *singleton) CheckAuthReq(r *http.Request) (map[string]interface{}, bool) {
+	cookie, err := r.Cookie("sid")
+	if err != nil {
+		return nil, false
+	}
+
+	return self.CheckAuth(cookie.Value)
+}
+func (self *singleton) CheckAuth(sid string) (map[string]interface{}, bool) {
+	var result map[string]interface{}
+
+	switch self.provider {
+	case "mongodb":
+		mgoSession, err := mgo.Dial(self.config["dbHost"].(string))
+		if err != nil {
+			panic(err)
+		}
+		defer mgoSession.Close()
+		db := mgoSession.DB(self.config["dbName"].(string)).C("users")
+		/*cnt, err := db.Find(bson.M{"sid": sid}).Count()
+		if err != nil {
+			return nil, err
+
+		} else if cnt == 0 {
+			return nil, errors.New("Такой email не зарагестрирован")
+		}*/
+
+		err = db.Find(bson.M{"sid": sid}).One(&result)
+		if err != nil {
+			return nil, false
+
+		}
+	}
+	delete(result, "pass")
+	return result, true
 }

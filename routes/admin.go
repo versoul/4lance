@@ -19,18 +19,14 @@ func adminRoutes() http.Handler {
 
 func adminOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sess, _ := globalSessions.SessionStart(w, r)
-		defer sess.SessionRelease(w)
-
-		sessUser := sess.Get("user")
 
 		var userData = map[string]interface{}{}
-
-		if sessUser == nil {
+		data, authOk := a.CheckAuthReq(r)
+		if !authOk {
 			http.Error(w, http.StatusText(403), 403)
 			return
 		} else {
-			userData = getUserData(sessUser.(string))
+			userData = data
 			if userData["admin"].(bool) != true {
 				http.Error(w, http.StatusText(403), 403)
 				return
@@ -41,12 +37,10 @@ func adminOnly(next http.Handler) http.Handler {
 }
 
 func adminUsersPage(w http.ResponseWriter, r *http.Request) {
-	sess, _ := globalSessions.SessionStart(w, r)
-	defer sess.SessionRelease(w)
-	sessUser := sess.Get("user")
 	var userData = map[string]interface{}{}
-	if sessUser != nil {
-		userData = getUserData(sessUser.(string))
+	data, authOk := a.CheckAuthReq(r)
+	if authOk {
+		userData = data
 	}
 
 	session, err := mgo.Dial("localhost")
@@ -68,12 +62,10 @@ func adminUsersPage(w http.ResponseWriter, r *http.Request) {
 	})
 }
 func adminMainPage(w http.ResponseWriter, r *http.Request) {
-	sess, _ := globalSessions.SessionStart(w, r)
-	defer sess.SessionRelease(w)
-	sessUser := sess.Get("user")
 	var userData = map[string]interface{}{}
-	if sessUser != nil {
-		userData = getUserData(sessUser.(string))
+	data, authOk := a.CheckAuthReq(r)
+	if authOk {
+		userData = data
 	}
 
 	renderTemplate(w, "message", map[string]interface{}{

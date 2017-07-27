@@ -190,8 +190,8 @@ $( document ).ready(function() {
     }
     var socket = io({path: '/socket.io'});
     socket.on('connect', function() {
-        console.log('WID = ', socket.id,  getCookie('sessionid'))
-        var conf = {sid:'333'};
+        console.log('WID = ', socket.id,  getCookie('sid'))
+        var conf = {sid: getCookie('sid')};
         //Session id from cockie
         socket.emit('conn', JSON.stringify(conf));
     });
