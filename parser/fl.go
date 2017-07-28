@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"versoul/4lance/delivery"
 )
 
 type flParser struct {
@@ -146,5 +147,5 @@ func (self *flParser) parseOne(url string, id string) {
 		panic(err)
 	}
 
-	//delivery.Deliver()
+	delivery.Deliver(id)
 }

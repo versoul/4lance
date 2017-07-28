@@ -16,6 +16,7 @@ import (
 
 var (
 	localIp = "192.168.1.91"
+	sock    = socket.GetInstance()
 )
 
 func externalIP() (string, error) {
@@ -111,7 +112,7 @@ func InitRoutes() {
 		http.Redirect(w, r, "/dashboard/", http.StatusFound)
 	})
 
-	socket.SocketRoutes(r)
+	sock.SocketRoutes(r)
 
 	panic(http.ListenAndServe(":8080", r))
 }
