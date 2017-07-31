@@ -190,18 +190,24 @@ func (self *singleton) LoginUser(w http.ResponseWriter, email string, pass strin
 			return nil, errors.New("Пароль не верный")
 		}
 
-		sid, err := uuid.NewV4()
-		if err != nil {
-			panic(err)
+		sid, ok := result["sid"].(string)
+		if ok {
+
+		} else {
+			sidNew, err := uuid.NewV4()
+			if err != nil {
+				panic(err)
+			}
+			change := bson.M{"$set": bson.M{
+				"sid": sidNew.String(),
+			},
+			}
+			err = db.UpdateId(result["_id"], change)
+			sid = sidNew.String()
 		}
-		change := bson.M{"$set": bson.M{
-			"sid": sid.String(),
-		},
-		}
-		err = db.UpdateId(result["_id"], change)
 
 		expire := time.Now().AddDate(0, 0, 30)
-		cookie := http.Cookie{"sid", sid.String(), "/", "",
+		cookie := http.Cookie{"sid", sid, "/", "",
 			expire, "", (86400 * 30), false, false, "", nil}
 		http.SetCookie(w, &cookie)
 	}
