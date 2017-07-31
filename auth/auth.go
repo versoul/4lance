@@ -66,6 +66,7 @@ func (self *singleton) RegisterUser(email string, pass string) (interface{}, err
 			"pass":         getMD5Hash(pass),
 			"confirmEmail": false,
 			"admin":        false,
+			"wids":         []string{},
 		})
 		if err != nil {
 			panic(err)
