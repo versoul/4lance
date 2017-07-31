@@ -4,7 +4,6 @@ import (
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"net/http"
-	"strconv"
 )
 
 func adminRoutes() http.Handler {
@@ -51,14 +50,14 @@ func adminUsersPage(w http.ResponseWriter, r *http.Request) {
 	//Get data
 
 	db := session.DB("4lance").C("users")
-	cnt, err := db.Find(nil).Count()
+	result := []map[string]interface{}{}
+	err = db.Find(nil).All(&result)
 	if err != nil {
 		panic(err)
 	}
-	renderTemplate(w, "message", map[string]interface{}{
-		"Type":    "success",
-		"Message": "Admin users page. Users count: " + strconv.Itoa(cnt),
-		"user":    userData,
+	renderTemplate(w, "adminUsers", map[string]interface{}{
+		"users": result,
+		"user":  userData,
 	})
 }
 func adminMainPage(w http.ResponseWriter, r *http.Request) {
@@ -68,9 +67,8 @@ func adminMainPage(w http.ResponseWriter, r *http.Request) {
 		userData = data
 	}
 
-	renderTemplate(w, "message", map[string]interface{}{
-		"Type":    "success",
-		"Message": "Admin main page",
-		"user":    userData,
+	renderTemplate(w, "adminMain", map[string]interface{}{
+		"data": "<a href='/admin/users/'>Пользователи</a>",
+		"user": userData,
 	})
 }

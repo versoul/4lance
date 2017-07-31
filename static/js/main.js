@@ -35,7 +35,7 @@ $( document ).ready(function() {
     }
 
 
-    $("#projectsList tr").click(function(e){
+    $("#projectsList").click(function(e){
         if(!e.ctrlKey){
             e.preventDefault();
             var row = $(e.target).closest("tr");
@@ -183,20 +183,96 @@ $( document ).ready(function() {
 
 
     /*********************/
+    function siteToIcon(site) {
+        var icon = "";
+        switch (site) {
+            case "f-l":
+                icon = "free-lance.ru.gif";
+                break;
+            case "wl":
+                icon = "weblancer.net.gif";
+                break;
+            case "fl":
+                icon = "freelance.png";
+                break;
+            case "flm":
+                icon = "freelancim.png";
+                break;
+        }
+        return icon;
+    }
+    function siteToName(site) {
+        var icon = ""
+        switch (site) {
+            case "f-l":
+                icon = "fl.ru";
+                break;
+            case "wl":
+                icon = "weblancer.net";
+                break;
+            case "fl":
+                icon = "freelance.ru";
+                break;
+            case "flm":
+                icon = "freelansim.ru";
+                break;
+        }
+        return icon;
+    }
+    function toFullLink(site, href) {
+        var link = ""
+        switch (site) {
+            case "f-l":
+                link = "https://www.fl.ru";
+                break;
+            case "wl":
+                link = "https://www.weblancer.net";
+                break;
+            case "fl":
+                link = "freelance.png";
+                break;
+            case "flm":
+                link = "freelancim.png";
+                break;
+        }
+        link += href;
+        return link;
+    }
+    function formatTime(dateStr){
+        var d = new Date(dateStr);
+        var month = (''+(d.getMonth()+1)).length<2?'0'+(d.getMonth()+1):d.getMonth()+1;
+        var day = (''+d.getDate()).length<2?'0'+d.getDate():d.getDate();
+        var hours = (''+d.getHours()).length<2?'0'+d.getHours():d.getHours();
+        var minutes = (''+d.getMinutes()).length<2?'0'+d.getMinutes():d.getMinutes();
+        return day+'.'+month+' '+hours+':'+minutes;
+    }
+    function addProject(p){
+        var projectsTable = $('#projectsList');
+        formatTime(p.projectDate);
+        $('#projectsList tr:first').before('<tr data-description=\''+p.projectDescription+
+            '\'><td><img src="/static/img/'+siteToIcon(p.site)+'" alt=""></td><td><a rel="nofolow" href="'+toFullLink(p.site, p.projectHref)+
+            '">'+p.projectTitle+'</a></td><td>'+p.projectPrice+'</td><td>'+formatTime(p.projectDate)+'</td></tr>');
+    }
     function getCookie(name) {
         var value = "; " + document.cookie;
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
     }
-    var socket = io({path: '/socket.io'});
-    socket.on('connect', function() {
-        console.log('WID = ', socket.id,  getCookie('sid'))
-        var conf = {sid: getCookie('sid')};
-        //Session id from cockie
-        socket.emit('conn', JSON.stringify(conf));
-    });
-    socket.on('msg', function(msg, sendAckCb){
-        console.log('msg', msg)
-        sendAckCb("ok");
-    });
+
+
+    if(window.location.pathname == '/dashboard/'){
+        var socket = io({path: '/socket.io'});
+        socket.on('connect', function() {
+            console.log('WID = ', socket.id,  getCookie('sid'))
+            var conf = {sid: getCookie('sid')};
+            //Session id from cockie
+            socket.emit('conn', JSON.stringify(conf));
+        });
+        socket.on('newProject', function(msg, sendAckCb){
+            console.log('msg', msg)
+            addProject(msg)
+            sendAckCb("ok");
+        });
+    }
+
 });

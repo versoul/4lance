@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"versoul/4lance/config"
@@ -10,7 +9,6 @@ import (
 
 var (
 	conf = config.GetInstance()
-	sock = socket.GetInstance()
 )
 
 func Deliver(projectId string) {
@@ -38,9 +36,10 @@ func Deliver(projectId string) {
 	for _, user := range users {
 		wids = user["wids"].([]interface{})
 		for _, wid := range wids {
-			fmt.Println("Send to socket wid=" + wid.(string))
+			//fmt.Println("Send wid=" + wid.(string))
+
 			//deliverBySocket(wid.(string), project)
-			sock.SendMessageByWid(wid.(string), project)
+			socket.SendMessageByWid(wid.(string), project)
 		}
 	}
 }

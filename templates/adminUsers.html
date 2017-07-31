@@ -1,0 +1,31 @@
+{{define "content"}}
+<div class="container">
+    <div class="caTheme panel panel-default">
+        <div class="panel-body">
+            <table id="usersList" class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>email</th>
+                        <th>wids</th>
+                        <th>confirmEmail</th>
+                        <th>categories</th>
+                        <th>keyword</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{range $i, $v := .users}}
+                {{ $widsLen := len $v.wids }}
+                <tr data-id="{{$v._id}}" {{if ne $widsLen 0 }}class="success"{{end}}>
+                    <td>{{$v.email}}</td>
+                    <td>{{$widsLen}}</td>
+                    <td>{{$v.confirmEmail}}</td>
+                    <td>{{len $v.filter.categories}}</td>
+                    <td>{{len $v.filter.keywords}}</td>
+                </tr>
+                {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{end}}

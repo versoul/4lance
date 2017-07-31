@@ -10,6 +10,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -40,6 +41,9 @@ func (self *singleton) Configure(providerName string, config map[string]interfac
 }
 func (self *singleton) RegisterUser(email string, pass string) (interface{}, error) {
 	var id interface{}
+
+	email = strings.ToLower(email)
+
 	switch self.provider {
 	case "mongodb":
 		mgoSession, err := mgo.Dial(self.config["dbHost"].(string))
@@ -156,6 +160,9 @@ func (self *singleton) ConfirmEmail(confirmationHash string) error {
 
 func (self *singleton) LoginUser(w http.ResponseWriter, email string, pass string) (map[string]interface{}, error) {
 	var result map[string]interface{}
+
+	email = strings.ToLower(email)
+
 	switch self.provider {
 	case "mongodb":
 		mgoSession, err := mgo.Dial(self.config["dbHost"].(string))
@@ -192,9 +199,9 @@ func (self *singleton) LoginUser(w http.ResponseWriter, email string, pass strin
 		}
 		err = db.UpdateId(result["_id"], change)
 
-		expire := time.Now().AddDate(0, 1, 0)
+		expire := time.Now().AddDate(0, 0, 30)
 		cookie := http.Cookie{"sid", sid.String(), "/", "",
-			expire, "", 86400, false, false, "", nil}
+			expire, "", (86400 * 30), false, false, "", nil}
 		http.SetCookie(w, &cookie)
 	}
 	delete(result, "pass")
