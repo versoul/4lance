@@ -50,8 +50,8 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 		if len(userFilterKeywords) > 0 {
 			var bsonKeywords = []bson.M{}
 			for _, keyword := range userFilterKeywords {
-				bsonKeywords = append(bsonKeywords, bson.M{"projectTitle": bson.M{"$regex": bson.RegEx{`\s` + keyword.(string) + `\s`, "gmi"}}})
-				bsonKeywords = append(bsonKeywords, bson.M{"projectDescription": bson.M{"$regex": bson.RegEx{keyword.(string), "gmi"}}})
+				bsonKeywords = append(bsonKeywords, bson.M{"projectTitle": bson.M{"$regex": bson.RegEx{keyword.(string), "mi"}}})
+				bsonKeywords = append(bsonKeywords, bson.M{"projectDescription": bson.M{"$regex": bson.RegEx{keyword.(string), "mi"}}})
 			}
 			bsonOrKeywords := bson.M{"$or": bsonKeywords}
 			query = bson.M{"$and": []bson.M{bsonCategories, bsonOrKeywords}}

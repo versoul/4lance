@@ -3,6 +3,7 @@ package delivery
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"regexp"
 	"versoul/4lance/config"
 	"versoul/4lance/socket"
 )
@@ -34,12 +35,26 @@ func Deliver(projectId string) {
 
 	wids := []interface{}{}
 	for _, user := range users {
-		wids = user["wids"].([]interface{})
-		for _, wid := range wids {
-			//fmt.Println("Send wid=" + wid.(string))
+		userFilter := user["filter"].(map[string]interface{})
+		userKeywords := userFilter["keywords"].([]interface{})
+		findKeyword := false
+		for _, keyword := range userKeywords {
+			re := regexp.MustCompile(`(?mi)` + keyword.(string))
+			if re.MatchString(project["projectDescription"].(string)) {
+				findKeyword = true
+			}
+			if re.MatchString(project["projectTitle"].(string)) {
+				findKeyword = true
+			}
+		}
 
-			//deliverBySocket(wid.(string), project)
-			socket.SendMessageByWid(wid.(string), project)
+		if len(userKeywords) == 0 || findKeyword {
+			wids = user["wids"].([]interface{})
+			for _, wid := range wids {
+				//fmt.Println("Send wid=" + wid.(string))
+				//deliverBySocket(wid.(string), project)
+				socket.SendMessageByWid(wid.(string), project)
+			}
 		}
 	}
 }
