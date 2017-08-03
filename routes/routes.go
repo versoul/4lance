@@ -113,5 +113,5 @@ func InitRoutes() {
 
 	socket.SocketRoutes(r)
 
-	panic(http.ListenAndServe(":8080", r))
+	panic(http.ListenAndServe(":80", r))
 }

@@ -1,11 +1,17 @@
 package delivery
 
 import (
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"regexp"
+	"strings"
 	"versoul/4lance/config"
 	"versoul/4lance/socket"
+	"versoul/4lance/templateHelpers"
 )
 
 var (
@@ -23,6 +29,7 @@ func Deliver(projectId string) {
 	dbC := mgoSession.DB(conf.DbName).C("users")
 	// Query All
 	var users []map[string]interface{}
+	var usersFiltered []map[string]interface{}
 	query := bson.M{"$and": []bson.M{
 		bson.M{"$where": "this.wids.length>0"},
 		bson.M{"filter.categories": bson.M{"$in": project["projectCategories"]}},
@@ -49,13 +56,23 @@ func Deliver(projectId string) {
 		}
 
 		if len(userKeywords) == 0 || findKeyword {
-			wids = user["wids"].([]interface{})
-			for _, wid := range wids {
-				//fmt.Println("Send wid=" + wid.(string))
-				//deliverBySocket(wid.(string), project)
-				socket.SendMessageByWid(wid.(string), project)
-			}
+			usersFiltered = append(usersFiltered, user)
 		}
+	}
+
+	//Проходим по пользователям которым подошел этот проект
+	for _, user := range usersFiltered {
+		//Если отправка по вебсокету
+		wids = user["wids"].([]interface{})
+		for _, wid := range wids {
+			//fmt.Println("Send wid=" + wid.(string))
+			//deliverBySocket(wid.(string), project)
+			socket.SendMessageByWid(wid.(string), project)
+		}
+		//если через pushAll
+		//TODO еще передавать ид юзера в пушал
+
+		//sendByPushAll(project)
 	}
 }
 
@@ -74,4 +91,47 @@ func getProjectById(projectId string) map[string]interface{} {
 		panic(err)
 	}
 	return project
+}
+
+func sendByPushAll(project map[string]interface{}) {
+	link := "https://pushall.ru/api.php"
+	//https://pushall.ru/api.php?type=unicast&id=3682&key=e093cedde9bde238d20ebd23bbbd2ac6&uid=59580&title=test&text=testtext\nnewtext&url=http://4lance.ru/dashboard/
+	//var jsonStr = `{"type":"unicast", "id":"3682", "key":"e093cedde9bde238d20ebd23bbbd2ac6", "uid":59580, "title":"` + project["projectTitle"].(string) + `", "text":"` + project["projectDescription"].(string) + `", "url": "http://4lance.ru/dashboard/"}`
+	fmt.Println(project["projectPrice"].(string))
+	fmt.Println(templateHelpers.StripTags(project["projectPrice"].(string)))
+	form := url.Values{
+		"type":  {"unicast"},
+		"id":    {"3682"},
+		"key":   {"e093cedde9bde238d20ebd23bbbd2ac6"},
+		"uid":   {"59580"},
+		"title": {templateHelpers.StripTags(project["projectTitle"].(string))},
+		"text": {
+			templateHelpers.StripTags(project["projectDescription"].(string)) +
+				"Бюджет: " + templateHelpers.StripTags(project["projectPrice"].(string)),
+		},
+		"url": {templateHelpers.ToFullLink(project["site"].(string), project["projectHref"].(string))},
+	}
+	/*form.Add("type", "unicast")
+	form.Add("id", "3682")
+	form.Add("key", "e093cedde9bde238d20ebd23bbbd2ac6")
+	form.Add("uid", "59580")
+	form.Add("title", templateHelpers.StripTags(project["projectTitle"].(string)))
+	form.Add("text", templateHelpers.StripTags(project["projectDescription"].(string)))
+	form.Add("url", templateHelpers.ToFullLink(project["site"].(string), project["projectHref"].(string)))*/
+
+	req, err := http.NewRequest("POST", link, strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	//req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
 }

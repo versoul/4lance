@@ -2,22 +2,25 @@ package templateHelpers
 
 import (
 	"html/template"
+	"regexp"
+	"strings"
 	"time"
 )
 
 //type helpers struct{}
 var Helpers = template.FuncMap{
-	"siteToIcon": siteToIcon,
-	"siteToName": siteToName,
-	"toFullLink": toFullLink,
-	"formatTime": formatTime,
-	"toHtml":     toHtml,
+	"siteToIcon": SiteToIcon,
+	"siteToName": SiteToName,
+	"toFullLink": ToFullLink,
+	"formatTime": FormatTime,
+	"toHtml":     ToHtml,
+	"stripTags":  StripTags,
 	"inc": func(i int) int {
 		return i + 1
 	},
 }
 
-func siteToIcon(site string) string {
+func SiteToIcon(site string) string {
 	icon := ""
 	switch site {
 	case "f-l":
@@ -31,7 +34,7 @@ func siteToIcon(site string) string {
 	}
 	return icon
 }
-func siteToName(site string) string {
+func SiteToName(site string) string {
 	icon := ""
 	switch site {
 	case "f-l":
@@ -45,7 +48,7 @@ func siteToName(site string) string {
 	}
 	return icon
 }
-func toFullLink(site string, href string) string {
+func ToFullLink(site string, href string) string {
 	link := ""
 	switch site {
 	case "f-l":
@@ -60,9 +63,15 @@ func toFullLink(site string, href string) string {
 	link += href
 	return link
 }
-func toHtml(str string) template.HTML {
+func ToHtml(str string) template.HTML {
 	return template.HTML(str)
 }
-func formatTime(date time.Time, layout string) string {
+func StripTags(str string) string {
+	re := regexp.MustCompile(`(?m)<\/?[^>]*>`)
+	str = re.ReplaceAllString(str, "")
+	str = strings.Replace(str, "&nbsp;", " ", -1)
+	return str
+}
+func FormatTime(date time.Time, layout string) string {
 	return date.Format(layout)
 }
