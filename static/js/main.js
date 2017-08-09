@@ -269,7 +269,7 @@ $( document ).ready(function() {
         formatTime(p.projectDate);
         $('#projectsList tr:first').before('<tr data-description=\''+p.projectDescription+
             '\'><td><img src="/static/img/'+siteToIcon(p.site)+'" alt=""></td><td><a rel="nofolow" href="'+toFullLink(p.site, p.projectHref)+
-            '">'+p.projectTitle+'</a></td><td>'+p.projectPrice+'</td><td>'+formatTime(p.projectDate)+'</td></tr>');
+            '">'+p.projectTitle+'</a></td><td class="nowrap hidden-xs">'+p.projectPrice+'</td><td class="nowrap hidden-xs col-md-2">'+formatTime(p.projectDate)+'</td></tr>');
 
 
         var curTime = Date.now();
