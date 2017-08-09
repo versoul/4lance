@@ -171,5 +171,6 @@ func removeWidsFromDb() {
 		"wids": bson.M{"$in": activeWids},
 	},
 	}
-	db.Update(query, change)
+
+	db.UpdateAll(query, change)
 }
