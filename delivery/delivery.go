@@ -67,7 +67,7 @@ func Deliver(projectId string) {
 		for _, wid := range wids {
 			//fmt.Println("Send wid=" + wid.(string))
 			//deliverBySocket(wid.(string), project)
-			socket.SendMessageByWid(wid.(string), project)
+			socket.SendMessageByWid(wid.(string), "newProject", project)
 		}
 		//если через pushAll
 		//TODO еще передавать ид юзера в пушал

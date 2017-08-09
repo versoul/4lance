@@ -7,14 +7,16 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
+	"time"
 	"versoul/4lance/auth"
 	"versoul/4lance/config"
 )
 
 var (
-	server *socketio.Server
-	conf   = config.GetInstance()
-	a      = auth.GetInstance()
+	server     *socketio.Server
+	conf       = config.GetInstance()
+	a          = auth.GetInstance()
+	activeWids = []string{}
 )
 
 func init() {
@@ -34,6 +36,10 @@ func init() {
 	server.On("error", func(so socketio.Socket, err error) {
 		panic(err)
 	})
+
+	ticker := time.NewTicker(1 * time.Minute)
+	go socketPingLoop(ticker)
+
 }
 
 func SocketRoutes(r chi.Router) {
@@ -100,12 +106,70 @@ func disconnectHandler(so socketio.Socket) {
 	db.Update(query, change)
 }
 
-func SendMessageByWid(wid string, project map[string]interface{}) {
-	server.BroadcastTo(wid, "newProject", project,
+func SendMessageByWid(wid string, msgType string, data map[string]interface{}) {
+	server.BroadcastTo(wid, msgType, data,
 		func(so socketio.Socket, data string) {
 			//Клиент подтвердил получение сообщения
-			if data == "ok" {
-				//fmt.Println("DELIVERED OK")
+			if msgType == "pingSocket" && data == "ok" {
+				removeFromActiveWids(so.Id())
 			}
 		})
+}
+
+func socketPingLoop(ticker *time.Ticker) {
+	for range ticker.C {
+		go socketPing()
+	}
+}
+
+func socketPing() {
+	if len(activeWids) > 0 {
+		removeWidsFromDb()
+		activeWids = []string{}
+	}
+
+	mgoSession, err := mgo.Dial(conf.DbHost)
+	if err != nil {
+		panic(err)
+	}
+	defer mgoSession.Close()
+	db := mgoSession.DB(conf.DbName).C("users")
+	result := []map[string]interface{}{}
+	query := bson.M{"$where": "this.wids.length>0"}
+	err = db.Find(query).Select(bson.M{"wids": 1, "email": 1, "_id": -1}).All(&result)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, val := range result {
+		usrWids := val["wids"].([]interface{})
+		for _, wid := range usrWids {
+			activeWids = append(activeWids, wid.(string))
+		}
+	}
+
+	for _, wid := range activeWids {
+		SendMessageByWid(wid, "pingSocket", map[string]interface{}{})
+	}
+}
+func removeFromActiveWids(wid string) {
+	for i, val := range activeWids {
+		if val == wid {
+			activeWids = append(activeWids[:i], activeWids[i+1:]...)
+		}
+	}
+}
+func removeWidsFromDb() {
+	mgoSession, err := mgo.Dial(conf.DbHost)
+	if err != nil {
+		panic(err)
+	}
+	defer mgoSession.Close()
+	db := mgoSession.DB(conf.DbName).C("users")
+	query := bson.M{"wids": bson.M{"$in": activeWids}}
+	change := bson.M{"$pull": bson.M{
+		"wids": bson.M{"$in": activeWids},
+	},
+	}
+	db.Update(query, change)
 }

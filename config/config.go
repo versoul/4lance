@@ -8,6 +8,7 @@ import (
 )
 
 type config struct {
+	SrvPort  string `json"srvPort"`
 	MailHost string `json"mailHost"`
 	MailPort int    `json"mailPort"`
 	MailUser string `json"mailUser"`

@@ -88,6 +88,12 @@
                             <button type="button" style="margin-top:20px;" id="filterSaveBtn" class="caTheme btn btn-blue" {{if not $root.user}}disabled{{end}}>Применить</button>
                             <button type="button" style="margin-top:20px;" id="filterResetBtn" class="caTheme btn btn-default" {{if not $root.user}}disabled{{end}}>Очистить</button>
                             <div class="clearfix"> </div>
+                            <hr/>
+                            <div class="checkbox">
+                                <label>
+                                    <input id="notifySound" type="checkbox"> Звуковые оповещения
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="caTheme panel panel-default">
@@ -95,6 +101,18 @@
                             Новости
                         </div>
                         <div class="panel-body news">
+                            <div>
+                                <div class="date">05.08.2017</div>
+                                <div class="content">
+                                    Реализованы звуковые оповещения о новых проектах.
+                                </div>
+                            </div>
+                            <div>
+                                <div class="date">04.08.2017</div>
+                                <div class="content">
+                                    Проект переехал на новый сервер. Скорость работы и отображения страниц должна улучшиться кардинально.
+                                </div>
+                            </div>
                             <div>
                                 <div class="date">31.07.2017</div>
                                 <div class="content">

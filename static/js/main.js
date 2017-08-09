@@ -1,9 +1,19 @@
 
+var lastNotifySoundTime = Date.now();
+var notifySound = false;
+
 $( document ).ready(function() {
     var dropRight = true;
+
+
     if($(window).width() < 977){
         dropRight = false;
     }
+    var sound = new Howl({
+        src: ['/static/media/5.mp3'],
+        volume: 0.5,
+    });
+
     $('.categoriesMultiselect').multiselect({
         enableClickableOptGroups: true,
         includeSelectAllOption: true,
@@ -180,6 +190,14 @@ $( document ).ready(function() {
             });
         }
     });
+    $('#notifySound').change(function(e){
+        if($(this).is(':checked')){
+            notifySound = true;
+        }
+        else{
+            notifySound = false;
+        }
+    });
 
 
     /*********************/
@@ -252,6 +270,17 @@ $( document ).ready(function() {
         $('#projectsList tr:first').before('<tr data-description=\''+p.projectDescription+
             '\'><td><img src="/static/img/'+siteToIcon(p.site)+'" alt=""></td><td><a rel="nofolow" href="'+toFullLink(p.site, p.projectHref)+
             '">'+p.projectTitle+'</a></td><td>'+p.projectPrice+'</td><td>'+formatTime(p.projectDate)+'</td></tr>');
+
+
+        var curTime = Date.now();
+        var deltaTime = (curTime - lastNotifySoundTime) / 1000;
+        if(deltaTime > 5){
+            if(notifySound){
+                sound.play();
+            }
+            lastNotifySoundTime = curTime;
+        }
+
     }
     function getCookie(name) {
         var value = "; " + document.cookie;
@@ -269,8 +298,12 @@ $( document ).ready(function() {
             socket.emit('conn', JSON.stringify(conf));
         });
         socket.on('newProject', function(msg, sendAckCb){
-            console.log('msg', msg)
+            console.log('msg1', msg)
             addProject(msg)
+            sendAckCb("ok");
+        });
+        socket.on('pingSocket', function(msg, sendAckCb){
+            console.log('msg2', msg)
             sendAckCb("ok");
         });
     }

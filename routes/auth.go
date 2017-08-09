@@ -7,11 +7,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"versoul/4lance/auth"
-	"versoul/4lance/config"
 )
 
 var (
-	conf = config.GetInstance()
 	a    = auth.GetInstance()
 )
 

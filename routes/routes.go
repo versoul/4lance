@@ -10,11 +10,13 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"versoul/4lance/config"
 	"versoul/4lance/socket"
 	"versoul/4lance/templateHelpers"
 )
 
 var (
+	conf    = config.GetInstance()
 	localIp = "192.168.1.91"
 )
 
@@ -113,5 +115,5 @@ func InitRoutes() {
 
 	socket.SocketRoutes(r)
 
-	panic(http.ListenAndServe(":80", r))
+	panic(http.ListenAndServe(":"+conf.SrvPort, r))
 }
