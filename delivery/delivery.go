@@ -72,7 +72,10 @@ func Deliver(projectId string) {
 		//если через pushAll
 		//TODO еще передавать ид юзера в пушал
 
-		//sendByPushAll(project)
+		paid, ok := user["paid"].(string)
+		if ok && paid != "" {
+			sendByPushAll(paid, project)
+		}
 	}
 }
 
@@ -93,7 +96,7 @@ func getProjectById(projectId string) map[string]interface{} {
 	return project
 }
 
-func sendByPushAll(project map[string]interface{}) {
+func sendByPushAll(paid string, project map[string]interface{}) {
 	link := "https://pushall.ru/api.php"
 	//https://pushall.ru/api.php?type=unicast&id=3682&key=e093cedde9bde238d20ebd23bbbd2ac6&uid=59580&title=test&text=testtext\nnewtext&url=http://4lance.ru/dashboard/
 	//var jsonStr = `{"type":"unicast", "id":"3682", "key":"e093cedde9bde238d20ebd23bbbd2ac6", "uid":59580, "title":"` + project["projectTitle"].(string) + `", "text":"` + project["projectDescription"].(string) + `", "url": "http://4lance.ru/dashboard/"}`
@@ -103,11 +106,11 @@ func sendByPushAll(project map[string]interface{}) {
 		"type":  {"unicast"},
 		"id":    {"3682"},
 		"key":   {"e093cedde9bde238d20ebd23bbbd2ac6"},
-		"uid":   {"59580"},
-		"title": {templateHelpers.StripTags(project["projectTitle"].(string))},
+		"uid":   {paid},
+		"title": {" " + templateHelpers.StripTags(project["projectTitle"].(string))},
 		"text": {
 			templateHelpers.StripTags(project["projectDescription"].(string)) +
-				"Бюджет: " + templateHelpers.StripTags(project["projectPrice"].(string)),
+				" Бюджет: " + templateHelpers.StripTags(project["projectPrice"].(string)),
 		},
 		"url": {templateHelpers.ToFullLink(project["site"].(string), project["projectHref"].(string))},
 	}
@@ -130,8 +133,6 @@ func sendByPushAll(project map[string]interface{}) {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("response Body:", string(body))
 }
