@@ -63,6 +63,7 @@ func renderTemplate(w http.ResponseWriter, name string, pageData map[string]inte
 	templates := []string{
 		"./templates/base.html",
 		"./templates/header.html",
+		"./templates/adsense.html",
 	}
 
 	ip, err := externalIP()
