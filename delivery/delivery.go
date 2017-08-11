@@ -31,7 +31,11 @@ func Deliver(projectId string) {
 	var users []map[string]interface{}
 	var usersFiltered []map[string]interface{}
 	query := bson.M{"$and": []bson.M{
-		bson.M{"$where": "this.wids.length>0"},
+		bson.M{"$or": []bson.M{
+			bson.M{"$where": "this.wids.length>0"},
+			bson.M{"paid": bson.M{"$ne": ""}},
+		},
+		},
 		bson.M{"filter.categories": bson.M{"$in": project["projectCategories"]}},
 	},
 	}
@@ -40,7 +44,6 @@ func Deliver(projectId string) {
 		panic(err)
 	}
 
-	wids := []interface{}{}
 	for _, user := range users {
 		userFilter := user["filter"].(map[string]interface{})
 		userKeywords := userFilter["keywords"].([]interface{})
@@ -60,18 +63,21 @@ func Deliver(projectId string) {
 		}
 	}
 
+	//wids := []interface{}{}
 	//Проходим по пользователям которым подошел этот проект
 	for _, user := range usersFiltered {
 		//Если отправка по вебсокету
-		wids = user["wids"].([]interface{})
-		for _, wid := range wids {
-			//fmt.Println("Send wid=" + wid.(string))
-			//deliverBySocket(wid.(string), project)
-			socket.SendMessageByWid(wid.(string), "newProject", project)
+		wids, ok := user["wids"].([]interface{})
+		if ok && len(wids) > 0 {
+			for _, wid := range wids {
+				//fmt.Println("Send wid=" + wid.(string))
+				//deliverBySocket(wid.(string), project)
+				socket.SendMessageByWid(wid.(string), "newProject", project)
+			}
 		}
+
 		//если через pushAll
 		//TODO еще передавать ид юзера в пушал
-
 		paid, ok := user["paid"].(string)
 		if ok && paid != "" {
 			sendByPushAll(paid, project)
@@ -100,8 +106,6 @@ func sendByPushAll(paid string, project map[string]interface{}) {
 	link := "https://pushall.ru/api.php"
 	//https://pushall.ru/api.php?type=unicast&id=3682&key=e093cedde9bde238d20ebd23bbbd2ac6&uid=59580&title=test&text=testtext\nnewtext&url=http://4lance.ru/dashboard/
 	//var jsonStr = `{"type":"unicast", "id":"3682", "key":"e093cedde9bde238d20ebd23bbbd2ac6", "uid":59580, "title":"` + project["projectTitle"].(string) + `", "text":"` + project["projectDescription"].(string) + `", "url": "http://4lance.ru/dashboard/"}`
-	fmt.Println(project["projectPrice"].(string))
-	fmt.Println(templateHelpers.StripTags(project["projectPrice"].(string)))
 	form := url.Values{
 		"type":  {"unicast"},
 		"id":    {"3682"},
