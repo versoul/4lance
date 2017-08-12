@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"versoul/4lance/delivery"
 )
 
 type wlParser struct {
@@ -135,4 +136,6 @@ func (self *wlParser) parseOne(url string, id string) {
 	if err != nil {
 		panic(err)
 	}
+
+	delivery.Deliver(id)
 }
