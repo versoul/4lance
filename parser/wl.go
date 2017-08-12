@@ -91,10 +91,8 @@ func (self *wlParser) parse() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			self.parseOne(projectHref, projectId)
-			return
+			go self.parseOne(projectHref, projectId)
 		}
-		go self.parseOne(projectHref, projectId)
 	})
 }
 func (self *wlParser) parseOne(url string, id string) {
