@@ -13,7 +13,10 @@ var (
 )
 
 func dashboardRoutes(r chi.Router) {
-	r.Get("/dashboard/:page", dashboardPage)
+	r.Route("/dashboard/", func(r chi.Router) {
+		r.Get("/", dashboardPage)
+		r.Get("/{page}", dashboardPage)
+	})
 }
 
 func dashboardPage(w http.ResponseWriter, r *http.Request) {
