@@ -2,7 +2,6 @@ package parser
 
 import (
 	"sync"
-
 	"time"
 )
 
@@ -30,5 +29,6 @@ func (self *singleton) Run() {
 	for range ticker.C {
 		go fl.parse()
 		go wl.parse()
+		go frl.parse()
 	}
 }

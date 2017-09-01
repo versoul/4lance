@@ -1,7 +1,9 @@
 body {
     background: url('/static/img/bg.png') repeat;
 }
-
+.nowrap {
+    white-space: nowrap;
+}
 .projects tr {
     cursor:pointer;
 }

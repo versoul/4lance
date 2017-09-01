@@ -27,7 +27,7 @@ func SiteToIcon(site string) string {
 		icon = "free-lance.ru.gif"
 	case "wl":
 		icon = "weblancer.net.gif"
-	case "fl":
+	case "frl":
 		icon = "freelance.png"
 	case "flm":
 		icon = "freelancim.png"
@@ -41,7 +41,7 @@ func SiteToName(site string) string {
 		icon = "fl.ru"
 	case "wl":
 		icon = "weblancer.net"
-	case "fl":
+	case "frl":
 		icon = "freelance.ru"
 	case "flm":
 		icon = "freelansim.ru"
@@ -55,8 +55,8 @@ func ToFullLink(site string, href string) string {
 		link = "https://www.fl.ru"
 	case "wl":
 		link = "https://www.weblancer.net"
-	case "fl":
-		link = "freelance.png"
+	case "frl":
+		link = "https://freelance.ru"
 	case "flm":
 		link = "freelancim.png"
 	}

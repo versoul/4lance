@@ -87,16 +87,26 @@ func dashboardPage(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			for _, c := range row {
 				cr := c.(map[string]interface{})
-				childs := cr["childs"].([]interface{})
-				for _, child := range childs {
-					child1 := child.(map[string]interface{})
-					tid := child1["tid"].(string)
+				childs, ok := cr["childs"].([]interface{})
+				if ok {
+					for _, child := range childs {
+						child1 := child.(map[string]interface{})
+						tid := child1["tid"].(string)
+						for _, v := range userFilterCategories {
+							if v.(string) == tid {
+								child1["activ"] = true
+							}
+						}
+					}
+				} else {
+					tid := cr["tid"].(string)
 					for _, v := range userFilterCategories {
 						if v.(string) == tid {
-							child1["activ"] = true
+							cr["activ"] = true
 						}
 					}
 				}
+
 			}
 		}
 	}

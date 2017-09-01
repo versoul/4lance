@@ -69,11 +69,15 @@
                                 <p><img src='/static/img/{{siteToIcon $i}}' alt="" /><span>{{siteToName $i}}</span></p>
                                 <select class="categoriesMultiselect" multiple="multiple" {{if not $root.user}}disabled{{end}}>
                                     {{range $ii, $vv := $v}}
-                                    <optgroup label="{{$vv.name}}">
-                                        {{range $iii, $child := $vv.childs}}
-                                        <option value="{{$child.tid}}" {{if $child.activ}}selected="selected"{{end}}>{{$child.name}}</option>
+                                        {{if $vv.childs}}
+                                        <optgroup label="{{$vv.name}}">
+                                            {{range $iii, $child := $vv.childs}}
+                                            <option value="{{$child.tid}}" {{if $child.activ}}selected="selected"{{end}}>{{$child.name}}</option>
+                                            {{end}}
+                                        </optgroup>
+                                        {{else}}
+                                        <option value="{{$vv.tid}}" {{if $vv.activ}}selected="selected"{{end}}>{{$vv.name}}</option>
                                         {{end}}
-                                    </optgroup>
                                     {{end}}
                                 </select>
                             </div>

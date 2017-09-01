@@ -210,7 +210,7 @@ $( document ).ready(function() {
             case "wl":
                 icon = "weblancer.net.gif";
                 break;
-            case "fl":
+            case "frl":
                 icon = "freelance.png";
                 break;
             case "flm":
@@ -228,7 +228,7 @@ $( document ).ready(function() {
             case "wl":
                 icon = "weblancer.net";
                 break;
-            case "fl":
+            case "frl":
                 icon = "freelance.ru";
                 break;
             case "flm":
@@ -246,8 +246,8 @@ $( document ).ready(function() {
             case "wl":
                 link = "https://www.weblancer.net";
                 break;
-            case "fl":
-                link = "freelance.png";
+            case "frl":
+                link = "https://freelance.ru";
                 break;
             case "flm":
                 link = "freelancim.png";

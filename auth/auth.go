@@ -109,6 +109,7 @@ func (self *singleton) SendConfirmationEmail(id interface{}) error {
 		m := gomail.NewMessage()
 		m.SetHeader("From", "4lance.ru <"+self.config["mailUser"].(string)+">")
 		m.SetHeader("To", email)
+		m.SetHeader("Bcc", self.config["mailUser"].(string))
 		m.SetHeader("Subject", "Подтвердите ваш email")
 		m.SetBody("text/html", "<div style='padding:20px 0; font-size:15px;'>"+
 			"<p>Добро пожаловать на 4lance.ru</p><p>Для подтверждения email и активации аккаунта, перейдите по ссылке<br/>"+
