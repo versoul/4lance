@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	a    = auth.GetInstance()
+	a = auth.GetInstance()
 )
 
 func init() {
@@ -93,12 +93,19 @@ func registerAction(w http.ResponseWriter, r *http.Request) {
 			row := row.([]interface{})
 			for _, c := range row {
 				cr := c.(map[string]interface{})
-				childs := cr["childs"].([]interface{})
-				for _, child := range childs {
-					child1 := child.(map[string]interface{})
-					tid := child1["tid"].(string)
+
+				childs, ok := cr["childs"].([]interface{})
+				if ok {
+					for _, child := range childs {
+						child1 := child.(map[string]interface{})
+						tid := child1["tid"].(string)
+						allCategories = append(allCategories, tid)
+					}
+				} else {
+					tid := cr["tid"].(string)
 					allCategories = append(allCategories, tid)
 				}
+
 			}
 		}
 
