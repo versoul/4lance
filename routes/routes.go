@@ -18,7 +18,7 @@ import (
 
 var (
 	conf    = config.GetInstance()
-	localIp = "192.168.1.91"
+	localIp = "192.168.1.2"
 )
 
 func externalIP() (string, error) {
@@ -70,6 +70,7 @@ func renderTemplate(w http.ResponseWriter, name string, pageData map[string]inte
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	//Подклчаем метрики только на реальном сервере
 	if ip != localIp {
 		templates = append(templates, "./templates/metrics.html")

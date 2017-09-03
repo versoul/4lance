@@ -28,7 +28,7 @@ func authRoutes(r chi.Router) {
 	r.Get("/register/", registerPage)
 	r.Get("/login/", loginPage)
 	r.Get("/confirmMessage/", confirmMessagePage)
-	r.Get("/confirmEmail/:confirmationHash/", confirmEmailPage)
+	r.Get("/confirmEmail/{confirmationHash}/", confirmEmailPage)
 	r.Get("/logout/", logoutAction)
 
 	r.Post("/register/", registerAction)
