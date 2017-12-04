@@ -108,6 +108,7 @@ func InitRoutes() {
 	authRoutes(r)
 	settingsRoutes(r)
 	dashboardRoutes(r)
+	projectRoutes(r)
 
 	r.Mount("/admin/", adminRoutes())
 

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/pressly/chi"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -129,6 +130,7 @@ func loginAction(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	//fmt.Println(data)//TODO тут где-то проскакивает ошибка
 	_, err = a.LoginUser(w, data["email"].(string), data["password"].(string))
 	if err != nil {
 		w.Write([]byte("{\"status\":\"err\", \"error\":\"" + err.Error() + "\"}"))

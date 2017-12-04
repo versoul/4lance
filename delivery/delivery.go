@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -133,10 +134,17 @@ func sendByPushAll(paid string, project map[string]interface{}) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		fmt.Println("pushall http error")
+		fmt.Println(err.Error())
 	}
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:", string(body))
+	answ := map[string]interface{}{}
+	err = json.Unmarshal(body, answ)
+	_, ok := answ["success"].(string)
+	if err != nil || ok {
+		fmt.Println("pushall answer error")
+		fmt.Println(string(body))
+	}
 }
